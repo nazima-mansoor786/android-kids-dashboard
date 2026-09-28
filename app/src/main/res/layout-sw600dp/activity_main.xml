@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/rel_main"
+    android:background="@android:color/transparent"
+    tools:context="com.tabnova.aidashboard.Activity.MainActivity">
+
+    <ImageView
+        android:id="@+id/iv_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:src="@drawable/bg_new_dashboard"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/logo"
+        android:scaleType="fitCenter"
+        android:padding="30dp"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/tx_help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/open_setting"
+        android:gravity="center|start"
+        android:layout_alignParentBottom="true"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginStart="17dp"
+        android:layout_marginEnd="17dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginBottom="56dp"
+        android:visibility="gone"/>
+
+
+    <LinearLayout
+        android:id="@+id/ll_times_up"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tx_times_up_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/times_up"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_centerInParent="true"
+            android:padding="8dp"/>
+
+        <TextView
+            android:id="@+id/tx_times_up"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/times_up_str_new"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/ll_lock_screen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/screen_locked"
+            android:textColor="@color/black"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:padding="8dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/lock_scr_str"
+            android:textSize="16sp"
+            android:layout_gravity="center"
+            android:textColor="@color/black"
+            android:layout_marginStart="17dp"
+            android:layout_marginEnd="17dp"
+            android:layout_marginTop="16dp" />
+
+    </LinearLayout>
+
+
+
+    <TextView
+        android:id="@+id/tx_remain_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:background="#50FFFFFF"
+        android:layout_toStartOf="@+id/ll_status_bar"
+        android:visibility="gone"
+        />
+
+    <LinearLayout
+        android:id="@+id/ll_status_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:orientation="horizontal">
+
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/tx_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="4dp"
+                android:gravity="start"
+                android:layout_gravity="center|end"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="9dp"
+                android:layout_marginStart="16dp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                android:background="#50FFFFFF"
+                android:visibility="invisible"/>
+
+            <TextView
+                android:id="@+id/tx_login_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|end"
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="9dp"
+                android:layout_marginBottom="4dp"
+                android:background="#50FFFFFF"
+                android:gravity="start"
+                android:padding="4dp"
+                android:text="@string/offline"
+                android:textColor="@color/black"
+                android:textStyle="bold"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/tx_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:padding="4dp"
+            android:layout_gravity="center|end"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:background="#50FFFFFF" />
+
+        <TextClock
+            android:id="@+id/tx_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:gravity="end"
+            android:layout_gravity="center|end"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:background="#50FFFFFF"
+            android:format12Hour="hh:mm a"
+            android:visibility="gone"/>
+
+        <TextView
+            android:id="@+id/tx_battery_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
+            android:background="#50FFFFFF"
+            android:layout_gravity="end|center" />
+
+        <ImageView
+            android:id="@+id/iv_battery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/battery"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="end|center"
+            android:layout_marginEnd="16dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="8dp"
+        android:background="@color/transparent"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_exit_dashboard"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:tint="@color/colorPrimary"
+                android:id="@+id/iv_exit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_new_exit_dashboard"/>
+
+            <TextView
+                android:gravity="center"
+                android:textSize="@dimen/_8ssp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/exit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_set_wallpaper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/set_wallpaper"
+            android:visibility="invisible"/>
+
+        <LinearLayout
+            android:id="@+id/ll_parent_mode"
+            android:gravity="center"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:tint="@color/colorPrimary"
+                android:id="@+id/iv_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_parent_mode_dashboard"/>
+
+            <TextView
+                android:gravity="center"
+                android:textSize="@dimen/_8ssp"
+                android:textStyle="bold"
+                android:textColor="@color/colorPrimary"
+                android:text="@string/parent_mode_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tx_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:text="@string/logged_in_msg_str"
+        android:layout_margin="8dp"
+        android:background="#50FFFFFF"
+        android:gravity="center"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/ll_status_bar"
+        android:visibility="invisible"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerview_id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tx_login"
+        android:layout_above="@+id/ll_settings"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:layout_margin="8dp"/>
+
+    <LinearLayout
+        android:id="@+id/ll_logo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/iv_logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/logo"
+            android:scaleType="fitCenter"
+            android:padding="30dp" />
+
+    </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/rel_times_up"
+        layout="@layout/time_up"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/ll_app_blocked"
+        layout="@layout/app_blocked_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/ll_show_pwd"
+        layout="@layout/tranparent_password"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/ll_ask_permission"
+        layout="@layout/permission_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        />
+
+    <LinearLayout
+        android:id="@+id/ll_permission"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/grey_bg"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:src="@drawable/permission" />
+
+        <Button
+            android:id="@+id/btn_ok_permission"
+            android:layout_width="300dp"
+            android:layout_height="38dp"
+            android:gravity="center"
+            android:text="@string/ok"
+            android:textColor="@color/white"
+            android:background="@color/teal"
+            android:layout_gravity="center"
+            android:layout_margin="16dp"/>
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/ll_default_home"
+        layout="@layout/default_home_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+    <include
+        android:id="@+id/ll_splash"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        layout="@layout/activity_splash"
+        android:visibility="gone"/>
+
+    <!--    <include
+            android:id="@+id/ll_app_intro"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            layout="@layout/app_intro_fragment"
+            android:visibility="gone"
+            />-->
+
+    <FrameLayout
+        android:id="@+id/main_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:visibility="gone"/>
+
+</RelativeLayout>

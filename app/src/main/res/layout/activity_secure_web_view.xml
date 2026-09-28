@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Activity.SecureWebView">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_margin="8dp">
+
+           <!-- <EditText
+                android:id="@+id/ed_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="https://"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:maxLines="1"
+                android:inputType="text"
+                android:textColorHint="@color/grey"
+                android:textColor="@color/black"
+                android:layout_gravity="start"
+                android:paddingStart="4dp"
+                android:paddingEnd="8dp"
+                android:cursorVisible="true"/>-->
+
+            <ImageView
+                android:id="@+id/iv_back"
+                android:layout_gravity="center"
+                android:padding="@dimen/_4sdp"
+                android:src="@drawable/ic_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:tint="@color/grey" />
+
+            <AutoCompleteTextView
+                android:id="@+id/ed_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="https://"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:lines="1"
+                android:inputType="text"
+                android:textColorHint="@color/grey"
+                android:textColor="@color/black"
+                android:layout_gravity="start"
+                android:paddingStart="4dp"
+                android:paddingEnd="8dp"
+                android:cursorVisible="true"/>
+
+
+
+            <ImageView
+                android:id="@+id/iv_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cancel"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                app:tint="@color/grey" />
+
+            <ImageView
+                android:id="@+id/iv_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_search"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                app:tint="@color/grey" />
+
+        </LinearLayout>
+
+
+
+    </androidx.cardview.widget.CardView>
+
+    <WebView
+        android:id="@+id/webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</LinearLayout>

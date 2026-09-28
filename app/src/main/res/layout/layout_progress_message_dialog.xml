@@ -1,0 +1,30 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+        android:background="@color/black_transparent">
+
+    <ProgressBar
+            android:id="@+id/dialog_progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:indeterminateTintMode="src_in"
+            android:indeterminateTint="@color/teal"
+    />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/please_wait"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        android:lineSpacingExtra="1dp"
+        android:layout_marginTop="8dp"
+        android:textColor="@color/white"
+        android:layout_below="@+id/dialog_progressBar"/>
+
+</LinearLayout>

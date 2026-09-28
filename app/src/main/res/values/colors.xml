@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#8064A2</color>
+    <color name="colorPrimaryDark">#8064A2</color>
+    <color name="colorAccent">#8064A2</color>
+    <color name="colorLightPrimary">#808064A2</color>
+    <color name="white">#FFFFFF</color>
+    <color name="light_white">#80FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="grey">#808080</color>
+    <color name="black_transparent">#30000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="grey_bg">#F2F2F2</color>
+    <color name="teal">#8064A2</color>
+    <color name="teal_dark">#8064A2</color>
+    <color name="teal_light">#A388C3</color>
+    <color name="teal_transparent">#4FA388C3</color>
+    <color name="teal_dark_transparent">#70A388C3</color>
+    <color name="blue">#0000FF</color>
+    <color name="light_blue">#047ca4</color>
+    <color name="colorLoginButton">#403152</color>
+    <color name="light_grey">#dedede</color>
+</resources>

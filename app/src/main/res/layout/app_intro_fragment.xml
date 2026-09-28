@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey_bg">
+
+   <!-- <com.tabnova.aidashboard.Extra.CustomViewPager
+        android:id="@+id/vp_app_intro"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rec_permission_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        />
+
+    <Button
+        android:id="@+id/btn_continue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:background="@color/grey"
+        android:text="@string/continue_str"
+        android:textColor="@color/white"
+        android:textSize="16sp"/>
+
+
+</LinearLayout>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="1"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:layout_weight="0.4">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_margin="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_room"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:text="Enter room id to Join" />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/edt_room_id"
+            android:layout_gravity="center"
+            android:hint="12345" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_room_id"
+            android:layout_gravity="center"
+            android:hint="Room id" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_status"
+            android:layout_gravity="center"
+            android:hint="Status" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:layout_weight="0.4">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/start_call"
+            android:layout_gravity="center"
+            android:text="Initiate or Join Call" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_margin="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="If you are initalting a call
+             please share the room id to your parents. If you are joing the call, enter room id shared by parents" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:layout_weight="0.2">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_margin="5dp"
+            android:textSize="25sp"
+            android:layout_height="wrap_content"
+            android:id="@+id/end_call"
+            android:layout_gravity="center"
+            android:text="Hangup" />
+    </LinearLayout>
+
+
+
+
+</LinearLayout>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:background="#009530"
+        android:layout_height="wrap_content">
+     <!--   <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#009530" />-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_header"
+            android:typeface="monospace"
+            android:textSize="16dp"
+            android:text=""
+            android:layout_marginLeft="20dp"
+            android:textColor="#FFFFFFFF"
+            android:gravity="left" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="horizontal">
+        <ImageView
+            android:id="@+id/ImageView_error"
+            android:src="@drawable/fail"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:layout_height="50dp"
+            android:layout_width="50dp">
+
+        </ImageView>
+        <TextView
+            android:id="@+id/TextView_error_msg"
+            android:text=""
+            android:paddingLeft="10dp"
+            android:layout_toRightOf="@id/ImageView_error"
+            android:layout_centerVertical="true"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content">
+
+        </TextView>
+    </RelativeLayout>
+
+
+
+</LinearLayout>

@@ -1,0 +1,154 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
+android {
+    namespace "com.tabnova.aidashboard"
+    compileSdkVersion 35
+    defaultConfig {
+        //com.tabnova.classroomapp
+        //com.tabnova.aidashboard
+        applicationId "com.tabnova.aidashboard"
+        minSdkVersion 23
+        targetSdkVersion 35
+        versionCode 116
+        versionName "74.6"
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        setProperty("archivesBaseName", "Kids_Dashboard-$versionCode-$versionName")
+    }
+
+    signingConfigs {
+        classroomapp {
+            keyAlias 'classroomapp'
+            keyPassword 'classroomapp'
+            storeFile file("G:\\My Login Projects\\Images\\Package Manager\\Samsung School\\classroomapp.jks")
+            storePassword 'classroomapp'
+        }
+    }
+
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.classroomapp
+            //debuggable true
+        }
+        /*debug {
+            signingConfig signingConfigs.release
+            debuggable true
+        }*/
+    }
+
+    flavorDimensions "default"
+    productFlavors {
+        fabric {
+
+        }
+
+        fabricfree {
+
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    useLibrary 'org.apache.http.legacy'
+}
+
+dependencies {
+    //implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
+
+    //implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+
+    //No Inspection Gradle Compatible
+    implementation 'androidx.appcompat:appcompat:1.3.0'
+//    implementation "androidx.activity:activity:1.6.0-alpha05"
+    implementation "androidx.activity:activity:1.8.0"  // Or latest stable
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+
+    // FOR GOOGLE LOGIN
+    implementation 'com.google.firebase:firebase-messaging:24.1.0'
+    implementation 'com.google.firebase:firebase-core:21.1.1'
+    implementation 'com.google.firebase:firebase-auth:23.2.0'
+    implementation 'com.google.android.gms:play-services-identity:18.1.0'
+    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+
+    // Add the Firebase Crashlytics SDK.
+    implementation 'com.google.firebase:firebase-crashlytics:19.4.1'
+
+    //LOCATION
+    implementation 'com.google.android.gms:play-services-location:21.3.0'
+
+    // GOOGLE PLAY BILLING LIBRARY
+    implementation 'com.android.billingclient:billing:7.0.0'
+
+    // GSON LIBRARY
+    implementation 'com.google.code.gson:gson:2.8.6'
+
+    // WORK MANAGER LIBRARY
+    implementation "androidx.work:work-runtime:2.7.1"
+
+    // IMAGE LOADER LIBRARY
+    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+
+    // RETROFIT LIBRARY
+    implementation 'com.google.code.gson:gson:2.8.6'
+    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+
+    //For Samsung Knox
+    compileOnly files('libs/knoxsdk.jar')
+    runtimeOnly files('libs/supportlib.jar')
+
+    //VOLLEY
+    implementation 'com.android.volley:volley:1.2.0'
+
+    implementation 'com.github.hkk595:Resizer:v1.5'
+
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+
+    implementation 'org.jsoup:jsoup:1.13.1'
+
+    //TOOL TIP
+    implementation 'com.github.vihtarb:tooltip:0.2.0'
+
+    // DP AND SP LIBRARIES
+    implementation 'com.intuit.sdp:sdp-android:1.0.6'
+    implementation 'com.intuit.ssp:ssp-android:1.0.6'
+
+    /*implementation ("com.google.android.play:core:1.9.0"){
+        exclude group: 'com.google.android.play', module: 'core'
+    }*/
+
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    implementation 'androidx.multidex:multidex:2.0.1'
+
+    implementation 'androidx.credentials:credentials:1.3.0'
+//    implementation 'androidx.credentials:credentials-play-services-auth:1.3.0'
+
+    implementation project(path: ':vpnapp')
+    implementation project(path: ':screenshare')
+
+    testImplementation 'junit:junit:4.13.2'
+}
