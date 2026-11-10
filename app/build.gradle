@@ -2,6 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
+// Release signing is read from <root>/keystore.properties (not tracked by git).
+// If the file is missing, release builds are left unsigned and debug builds are unaffected.
+def keystorePropertiesFile = rootProject.file('keystore.properties')
+def keystoreProperties = new java.util.Properties()
+if (keystorePropertiesFile.exists()) {
+    keystorePropertiesFile.withInputStream { keystoreProperties.load(it) }
+}
+
 android {
     namespace "com.tabnova.aidashboard"
     compileSdkVersion 35
@@ -19,11 +27,13 @@ android {
     }
 
     signingConfigs {
-        classroomapp {
-            keyAlias 'classroomapp'
-            keyPassword 'classroomapp'
-            storeFile file("G:\\My Login Projects\\Images\\Package Manager\\Samsung School\\classroomapp.jks")
-            storePassword 'classroomapp'
+        if (keystorePropertiesFile.exists()) {
+            release {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
         }
     }
 
@@ -38,7 +48,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.classroomapp
+            if (keystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
             //debuggable true
         }
         /*debug {
@@ -47,23 +59,18 @@ android {
         }*/
     }
 
-    flavorDimensions "default"
-    productFlavors {
-        fabric {
-
-        }
-
-        fabricfree {
-
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
     useLibrary 'org.apache.http.legacy'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 dependencies {

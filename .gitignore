@@ -54,3 +54,13 @@ Thumbs.db
 /app/customdashboard-app.iml
 /.gradle/
 /build/intermediates/lint-cache/
+
+# Local machine config and signing secrets
+local.properties
+keystore.properties
+*.jks
+*.keystore
+
+# Allow the Samsung Knox SDK jars and the Gradle wrapper jar despite the *.jar rule above
+!app/libs/*.jar
+!gradle/wrapper/gradle-wrapper.jar

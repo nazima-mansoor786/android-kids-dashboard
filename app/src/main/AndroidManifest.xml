@@ -79,7 +79,7 @@
     <application
         android:name=".CustomDashboardApplication"
         android:allowBackup="false"
-        android:enableOnBackInvokedCallback="true"
+        android:enableOnBackInvokedCallback="false"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:isAccessibilityTool="false"
