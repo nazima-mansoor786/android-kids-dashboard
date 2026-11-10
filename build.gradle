@@ -5,8 +5,7 @@ plugins {
     id 'com.android.application' version '8.13.2' apply false
     id 'com.android.library' version '8.13.2' apply false
     id 'com.google.gms.google-services' version '4.4.2' apply false
-    // Crashlytics plugin stays at 2.2.0 until Phase 2.
-    id 'com.google.firebase.crashlytics' version '2.2.0' apply false
+    id 'com.google.firebase.crashlytics' version '3.0.6' apply false // TODO verify: latest 3.x (Google Maven/Firebase notes unreachable)
 }
 
 tasks.register('clean', Delete) {

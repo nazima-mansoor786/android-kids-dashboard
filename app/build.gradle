@@ -21,7 +21,6 @@ android {
         targetSdk 35
         versionCode 116
         versionName "74.6"
-        multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         setProperty("archivesBaseName", "Kids_Dashboard-$versionCode-$versionName")
     }
@@ -77,28 +76,29 @@ dependencies {
     //implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
 
     //implementation fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestImplementation('androidx.test.espresso:espresso-core:3.1.0', {
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.7.0', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
     //No Inspection Gradle Compatible
-    implementation 'androidx.appcompat:appcompat:1.3.0'
-//    implementation "androidx.activity:activity:1.6.0-alpha05"
-    implementation "androidx.activity:activity:1.8.0"  // Or latest stable
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.activity:activity:1.13.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
+    implementation 'com.google.android.material:material:1.14.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+
+    // FIREBASE (versions managed by the BoM)
+    implementation platform('com.google.firebase:firebase-bom:34.4.0') // TODO verify: latest BoM (Firebase notes unreachable)
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'com.google.firebase:firebase-auth'
 
     // FOR GOOGLE LOGIN
-    implementation 'com.google.firebase:firebase-messaging:24.1.0'
-    implementation 'com.google.firebase:firebase-core:21.1.1'
-    implementation 'com.google.firebase:firebase-auth:23.2.0'
     implementation 'com.google.android.gms:play-services-identity:18.1.0'
     implementation 'com.google.android.gms:play-services-auth:21.2.0'
 
     // Add the Firebase Crashlytics SDK.
-    implementation 'com.google.firebase:firebase-crashlytics:19.4.1'
+    implementation 'com.google.firebase:firebase-crashlytics'
 
     //LOCATION
     implementation 'com.google.android.gms:play-services-location:21.3.0'
@@ -106,22 +106,20 @@ dependencies {
     // GOOGLE PLAY BILLING LIBRARY
     implementation 'com.android.billingclient:billing:7.0.0'
 
-    // GSON LIBRARY
-    implementation 'com.google.code.gson:gson:2.8.6'
-
     // WORK MANAGER LIBRARY
-    implementation "androidx.work:work-runtime:2.7.1"
+    // 2.12.0+ requires minSdk 24; 2.11.x is the latest line supporting minSdk 23.
+    implementation 'androidx.work:work-runtime:2.11.2'
 
     // IMAGE LOADER LIBRARY
     implementation 'com.nostra13.universalimageloader:universal-image-loader:1.9.5'
 
     // RETROFIT LIBRARY
-    implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'com.squareup.retrofit2:retrofit:2.5.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.google.code.gson:gson:2.15.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.1'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.1'
 
     //For Samsung Knox
     compileOnly files('libs/knoxsdk.jar')
@@ -132,9 +130,13 @@ dependencies {
 
     implementation 'com.github.hkk595:Resizer:v1.5'
 
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    // Replaces lifecycle-extensions; lifecycle-process provides ProcessLifecycleOwner.
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime:2.10.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.10.0'
 
-    implementation 'org.jsoup:jsoup:1.13.1'
+    implementation 'org.jsoup:jsoup:1.24.1'
 
     //TOOL TIP
     implementation 'com.github.vihtarb:tooltip:0.2.0'
@@ -147,12 +149,10 @@ dependencies {
         exclude group: 'com.google.android.play', module: 'core'
     }*/
 
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.2'
 
-    implementation 'androidx.multidex:multidex:2.0.1'
-
-    implementation 'androidx.credentials:credentials:1.3.0'
-//    implementation 'androidx.credentials:credentials-play-services-auth:1.3.0'
+    implementation 'androidx.credentials:credentials:1.6.0'
+    implementation 'androidx.credentials:credentials-play-services-auth:1.6.0'
 
     implementation project(path: ':vpnapp')
     implementation project(path: ':screenshare')
