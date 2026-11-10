@@ -4,11 +4,11 @@ plugins {
 
 android {
     namespace "com.rsb.vpnpoc"
-    compileSdkVersion 35
+    compileSdk 36
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 35
+        minSdk 23
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 

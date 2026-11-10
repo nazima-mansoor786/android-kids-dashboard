@@ -1,3 +1,28 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            // Crashlytics 2.2.0 has no plugin marker artifact; map the id to its module.
+            if (requested.id.id == 'com.google.firebase.crashlytics') {
+                useModule("com.google.firebase:firebase-crashlytics-gradle:${requested.version}")
+            }
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 include ':app'
 include ':vpnapp'
 include ':screenshare'
