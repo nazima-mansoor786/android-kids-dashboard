@@ -71,7 +71,7 @@ java {
 }
 
 dependencies {
-    //implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
+    implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1' // TODO verify: latest version (Google Maven unreachable here)
 
     //implementation fileTree(dir: 'libs', include: ['*.jar'])
     androidTestImplementation('androidx.test.espresso:espresso-core:3.7.0', {
