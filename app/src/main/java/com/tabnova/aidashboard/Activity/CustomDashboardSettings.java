@@ -90,11 +90,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.BuildConfig;
 import com.google.gson.Gson;
@@ -124,6 +119,7 @@ import com.tabnova.aidashboard.Extra.ApkInfoExtractor;
 import com.tabnova.aidashboard.Extra.BillingManager;
 import com.tabnova.aidashboard.Extra.Consts;
 import com.tabnova.aidashboard.Extra.DialogLoader;
+import com.tabnova.aidashboard.Extra.GoogleAuthManager;
 import com.tabnova.aidashboard.Extra.NetConnectivity;
 import com.tabnova.aidashboard.Extra.OnResponseListener;
 import com.tabnova.aidashboard.Extra.RetrofitExtra;
@@ -349,9 +345,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
     // URI
     private Uri profileImageURI = null;
-
-    // GOOGLE API CLIENT
-    private GoogleApiClient mGoogleApiClient;
 
     // BUTTON
     private Button btnDashBoard;
@@ -633,11 +626,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                 }
             }
         }
-
-        // GOOGLE SIGN OPTIONS
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
 
         /*mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .enableAutoManage(this, this)
@@ -5499,21 +5487,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 //ShowMessage.showError(context, jsonObject.getString(Consts.error));
-                                try {
-                                    GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                                            .requestEmail()
-                                            .build();
-
-                                    GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(context, gso);
-
-                                    final GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(context);
-
-                                    if (googleSignInAccount != null) {
-                                        googleSignInClient.signOut();
-                                    }
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
+                                GoogleAuthManager.signOut(context, null);
 
                                 CustomDashboardApplication.setInt(context, Consts.is_logged_in, 0);
                                 CustomDashboardApplication.setString(context, Consts.PWD_ENCRY, "0000");
