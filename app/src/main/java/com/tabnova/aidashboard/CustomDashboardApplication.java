@@ -57,7 +57,6 @@ import androidx.work.NetworkType;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -106,7 +105,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
     public static GoogleApiClient googleApiClient;
-    GoogleSignInOptions gso;
     public static ArrayList<ApplicationTimerModel> currentApplicationModels = new ArrayList<>();
     public static final String ACTION_STATE_CHANGED = "com.tabnova.aidashboard.MainActivity.ACTION_STATE_CHANGED";
     private AppCompatDialog alertDialogRateApp;
@@ -140,10 +138,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
         mInstance = this;
         com.tabnova.aidashboard.Extra.BillingManager.getInstance().init(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
-
-        gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
 
         buildGoogleApiClient();
 

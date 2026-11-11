@@ -94,14 +94,6 @@
         tools:targetApi="s">
 
         <meta-data
-            android:name="com.google.android.gms.auth.api.identity"
-            android:value="@string/default_web_client_id" />
-
-        <meta-data
-            android:name="com.google.android.gms.auth.api.signin"
-            android:value="@string/default_web_client_id" />
-
-        <meta-data
             android:name="isMonitoringTool"
             android:value="child_monitoring" />
 

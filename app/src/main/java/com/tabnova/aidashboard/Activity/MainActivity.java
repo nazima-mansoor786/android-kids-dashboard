@@ -82,9 +82,6 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.google.android.gms.auth.api.Auth;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.BuildConfig;
 import com.google.gson.JsonObject;
@@ -219,7 +216,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     List<String> blockDomainWebsitesList = new ArrayList<>();
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int RC_SIGN_IN = 123;
 //    private GoogleApiClient mGoogleApiClient;
 
     // CONTEXT
@@ -2399,11 +2395,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         }.start();
 
         return status[0];
-    }
-
-    private void signIn() {
-        /*Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);*/
     }
 
     // SHOW ENTER PASSWORD POP UP
@@ -4729,11 +4720,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == RC_SIGN_IN) {
-            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
-        }
-
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
             if (resultCode == Activity.RESULT_OK) {
                 if (requestCode == SELECT_FILE)
@@ -4785,23 +4771,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            CustomDashboardApplication.setInt(context, Consts.INSTALLED_APP, CustomDashboardApplication.getInt(context, Consts.INSTALLED_APP) + 1);
-            CustomDashboardApplication.setInt(context, Consts.IS_GOOGLE_LOGIN, 1);
-            assert acct != null;
-            alertDialogNote.dismiss();
-        } else {
-            CustomDashboardApplication.setInt(context, Consts.INSTALLED_APP, 0);
-            CustomDashboardApplication.setInt(context, Consts.IS_GOOGLE_LOGIN, 0);
-            alertDialogNote.dismiss();
-        }
-        llLogo.setVisibility(View.GONE);
-        ivLogo.setVisibility(View.GONE);
     }
 
     boolean isMyLauncherDefault() {

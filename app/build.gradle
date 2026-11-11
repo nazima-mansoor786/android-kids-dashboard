@@ -89,11 +89,9 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:34.4.0') // TODO verify: latest BoM (Firebase notes unreachable)
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-auth'
 
     // FOR GOOGLE LOGIN
-    implementation 'com.google.android.gms:play-services-identity:18.1.0'
-    implementation 'com.google.android.gms:play-services-auth:21.2.0'
+    implementation 'com.google.android.gms:play-services-auth:22.0.0' // TODO verify: newer 22.x (official Authorization guide shows 22.0.0)
 
     // Add the Firebase Crashlytics SDK.
     implementation 'com.google.firebase:firebase-crashlytics'
