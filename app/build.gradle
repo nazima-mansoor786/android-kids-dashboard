@@ -134,9 +134,6 @@ dependencies {
 
     implementation 'org.jsoup:jsoup:1.24.1'
 
-    //TOOL TIP
-    implementation 'com.github.vihtarb:tooltip:0.2.0'
-
     // DP AND SP LIBRARIES
     implementation 'com.intuit.sdp:sdp-android:1.1.1'
     implementation 'com.intuit.ssp:ssp-android:1.1.1'

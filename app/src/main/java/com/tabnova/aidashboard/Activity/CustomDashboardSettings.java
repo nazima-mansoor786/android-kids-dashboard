@@ -166,7 +166,7 @@ import com.tabnova.aidashboard.Service.AppVisibilityService;
 import com.tabnova.screenshare.MediaProjectionService;
 import com.tabnova.screenshare.SignallingClient;
 import com.tabnova.screenshare.StartStopScreenShare;
-import com.tooltip.Tooltip;
+import com.tabnova.aidashboard.Extra.TooltipHelper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -419,8 +419,8 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     boolean isPause = false;
 
     //TOOL TIP
-    Tooltip loginToolTip;
-    Tooltip applicationToolTip;
+    TooltipHelper loginToolTip;
+    TooltipHelper applicationToolTip;
 
     // STRING BUILDER
     StringBuilder mainSb = new StringBuilder();
@@ -3267,7 +3267,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
             } else {
                 Log.e(TAG, "run: @2519");
                 if (icon != null && !isSpotLightShown && CustomDashboardApplication.getInt(context, Consts.isAppClick) != 2) {
-                    applicationToolTip = new Tooltip.Builder(icon)
+                    applicationToolTip = new TooltipHelper.Builder(icon)
                             .setText("Select Applications From Application List You Want To Add On Dashboard")
                             .setTextColor(getResources().getColor(R.color.white))
                             .setBackgroundColor(getResources().getColor(R.color.colorPrimary))
