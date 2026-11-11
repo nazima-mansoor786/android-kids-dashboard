@@ -70,7 +70,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
@@ -83,19 +82,11 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchaseHistoryRecord;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.firebase.BuildConfig;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
@@ -155,7 +146,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class MainActivity extends BaseActivity implements RecyclerViewAdapter.OnAppSelectListner, OnResponseListener, PurchasesUpdatedListener {
+public class MainActivity extends BaseActivity implements RecyclerViewAdapter.OnAppSelectListner, OnResponseListener {
     // INTEGER
     private int pointerCount;
     Integer request = 0;
@@ -280,9 +271,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     ArrayList<String> posList = new ArrayList<>();
 
     private boolean isProfileDeteted = false;
-
-    // BILLING CLIENT
-    private BillingClient billingClient;
 
     //SESSION MANAGER
     private SessionManager sessionManager;
@@ -1236,11 +1224,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     @Override
     public void onFailed(Throwable t) {
         t.printStackTrace();
-    }
-
-    @Override
-    public void onPurchasesUpdated(@NonNull BillingResult billingResult, @Nullable List<Purchase> list) {
-
     }
 
 
@@ -5127,76 +5110,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         lastMonth.set(Calendar.MINUTE, 0);
         lastMonth.set(Calendar.SECOND, 0);
         CustomDashboardApplication.setLastWeekLong(context, Consts.lastMonthLong, lastMonth.getTimeInMillis());
-    }
-
-    private void setupBillingClient() {
-        isHomeApp = 1;
-        billingClient = BillingClient.newBuilder(context)
-                .setListener(this)
-                .enablePendingPurchases()
-                .build();
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    if (billingClient.isReady()) {
-                        queryPurchaseHistory();
-                    } else {
-                        CustomDashboardApplication.isBillingLaunched = false;
-                    }
-                } else {
-                    CustomDashboardApplication.isBillingLaunched = false;
-                }
-            }
-
-            @Override
-            public void onBillingServiceDisconnected() {
-                CustomDashboardApplication.isBillingLaunched = false;
-            }
-        });
-    }
-
-    private void queryPurchaseHistory() {
-        isHomeApp = 1;
-        QueryPurchaseHistoryParams queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build();
-        billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams, (client, purchasesList) -> {
-            if (client.getResponseCode() == BillingClient.BillingResponseCode.OK && purchasesList != null && purchasesList.size() > 0) {
-                boolean isProductFound = false;
-                for (PurchaseHistoryRecord purchase : purchasesList) {
-                    Log.e(TAG, "queryPurchaseHistoryAsync : " + new Gson().toJson(purchase));
-                    if (!TextUtils.isEmpty(purchase.getOriginalJson())) {
-                        try {
-                            Log.e(TAG, "onBillingSetupFinished: Purchase JSON " + purchase.getOriginalJson());
-                            JSONObject jObj = new JSONObject(purchase.getOriginalJson());
-                            if (Utils.contains(jObj, Consts.productId)) {
-                                if (jObj.getString(Consts.productId).equalsIgnoreCase(Consts.subscriptionId)) {
-                                    String purchaseToken = purchase.getPurchaseToken();
-                                    String purchaseTime = String.valueOf(purchase.getPurchaseTime());
-
-                                    sessionManager.setPurchaseToken(purchaseToken);
-                                    sessionManager.setPurchaseTime(purchaseTime);
-                                }
-
-                                isProductFound = true;
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                if (isProductFound) {
-                    sessionManager.setIsSubscriptionEnabled(true);
-
-                    if ((blockDomainWebsitesList != null && blockDomainWebsitesList.size() > 0) || sessionManager.isApplyBlockDomains()) {
-                        stopVPN();
-                        startVPN();
-                    }
-                } else {
-                    sessionManager.setIsSubscriptionEnabled(false);
-                }
-            }
-        });
     }
 
     private void readFromFile() {
