@@ -3820,6 +3820,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     @Override
     protected void onResume() {
         super.onResume();
+        com.tabnova.aidashboard.Extra.BillingManager.getInstance().refreshEntitlement(null);
 
         posList = new ArrayList<>();
 

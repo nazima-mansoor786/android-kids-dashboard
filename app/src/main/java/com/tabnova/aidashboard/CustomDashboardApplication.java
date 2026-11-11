@@ -138,6 +138,7 @@ public class CustomDashboardApplication extends Application implements Lifecycle
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        com.tabnova.aidashboard.Extra.BillingManager.getInstance().init(this);
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

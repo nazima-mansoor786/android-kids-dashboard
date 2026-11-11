@@ -371,5 +371,7 @@ public class Consts {
     public static String location = "location";
     public static String defaultWallpaperPath = "https://cloud.kidsdashboard.co.uk/images/photos/";
     public static String subscriptionId = "kids_dash_yearly";
+    // TODO: set to the base plan ID of kids_dash_yearly from Play Console. Empty = accept any base plan offer.
+    public static final String BASE_PLAN_ID = "";
     public static String productId = "productId";
 }
