@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.credentials.GetCredentialException;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,40 +25,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.IntentSenderRequest;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.credentials.CredentialManager;
-import androidx.credentials.GetCredentialRequest;
-import androidx.credentials.GetCredentialResponse;
-import androidx.credentials.GetPasswordOption;
-import androidx.credentials.GetPublicKeyCredentialOption;
-import androidx.credentials.CredentialManager;
-import androidx.credentials.GetCredentialRequest;
-import androidx.credentials.GetCredentialResponse;
 //import androidx.credentials.playservices.auth.GoogleIdTokenCredential;
 //import androidx.credentials.playservices.auth.GetGoogleIdTokenOption;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.auth.api.identity.BeginSignInRequest;
-import com.google.android.gms.auth.api.identity.Identity;
-import com.google.android.gms.auth.api.identity.SignInClient;
-import com.google.android.gms.auth.api.identity.SignInCredential;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.GoogleSignInResult;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -70,6 +44,7 @@ import com.google.gson.TypeAdapter;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Extra.Consts;
 import com.tabnova.aidashboard.Extra.DialogLoader;
+import com.tabnova.aidashboard.Extra.GoogleAuthManager;
 import com.tabnova.aidashboard.Extra.NetConnectivity;
 import com.tabnova.aidashboard.Extra.RetrofitExtra;
 import com.tabnova.aidashboard.Extra.RetrofitService;
@@ -81,10 +56,7 @@ import com.tabnova.aidashboard.R;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -149,7 +121,6 @@ public class Login extends BaseActivity {
 
     // GOOGLE LOGIN
     private static final String TAG = Login.class.getSimpleName();
-    private static final int RC_SIGN_IN = 123;
     private String emailStr;
 
     // API MANAGER
@@ -160,14 +131,11 @@ public class Login extends BaseActivity {
     private CardView cvProfileList;
 
     //    GoogleSignInClient googleSignInClient;
-    private SignInClient oneTapClient;
-    private BeginSignInRequest signInRequest;
 
     // Initialize Credential Manager
     //CredentialManager credentialManager = CredentialManager.create(context);
 
-    private CredentialManager credentialManager;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
+    private GoogleAuthManager.ConsentLauncher consentLauncher;
 
     //STRING
     String deviceToken = "";
@@ -204,25 +172,9 @@ public class Login extends BaseActivity {
                     Log.e("Login", "Device Token : " + deviceToken);
                 });
 
-        // GOOGLE SIGN OPTIONS
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .build();
-
-        credentialManager = CredentialManager.create(this);
-
         //googleSignInClient = GoogleSignIn.getClient(this, gso);
-        // Initialize Google Sign-In
-        oneTapClient = Identity.getSignInClient(this);
-
-        signInRequest = new BeginSignInRequest.Builder()
-                .setGoogleIdTokenRequestOptions(BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                        .setSupported(true)
-                        .setServerClientId(getString(R.string.default_web_client_id)) // Get from google-services.json
-                        .setFilterByAuthorizedAccounts(false)
-                        .build())
-                .setAutoSelectEnabled(true)
-                .build();
+        // Consent-screen launcher for AuthorizationClient (must be registered before the Activity is STARTED)
+        consentLauncher = new GoogleAuthManager.ConsentLauncher(this);
 
 // Create a request for credentials
         /*GetCredentialRequest credentialRequest = new GetCredentialRequest.Builder()
@@ -282,7 +234,7 @@ public class Login extends BaseActivity {
                 googleSignInClient.signOut();
             }*/
             //signIn();
-            googleSignIn();
+            startGoogleSignIn();
         });
 
         btnSkip.setOnClickListener(v -> {
@@ -423,37 +375,69 @@ public class Login extends BaseActivity {
             }
     );*/
 
-    private void googleSignIn() {
-        oneTapClient.beginSignIn(signInRequest)
-                .addOnSuccessListener(this, result -> {
-                    IntentSenderRequest intentSenderRequest = new IntentSenderRequest.Builder(result.getPendingIntent().getIntentSender()).build();
-                    signInLauncher.launch(intentSenderRequest);
-                })
-                .addOnFailureListener(this, e -> {
-                    e.printStackTrace();
-                    Log.e("GoogleSignIn", "Sign-in failed: " + e.getMessage());
-                    Toast.makeText(this, "Sign-in failed", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private final ActivityResultLauncher<IntentSenderRequest> signInLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartIntentSenderForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    try {
-                        SignInCredential credential = oneTapClient.getSignInCredentialFromIntent(result.getData());
-                        String idToken = credential.getGoogleIdToken();
-                        String email = credential.getId();
-                        if (idToken != null) {
-                            Log.d("GoogleSignIn", "Sign-in successful: " + email);
-                            Toast.makeText(this, "Welcome " + email, Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (ApiException e) {
-                        Log.e("GoogleSignIn", "Sign-in error: " + e.getStatusCode());
-                    }
+    // GOOGLE LOGIN: Credential Manager sign-in, then AuthorizationClient access token for the backend.
+    private void startGoogleSignIn() {
+        GoogleAuthManager.signIn(this, new GoogleAuthManager.SignInCallback() {
+            @Override
+            public void onSuccess(@NonNull String email, @NonNull String idToken) {
+                if (isFinishing()) {
+                    return;
                 }
+                dialogLoader.showProgressDialog();
+                GoogleAuthManager.getAccessToken(Login.this, consentLauncher, email, new GoogleAuthManager.AccessTokenCallback() {
+                    @Override
+                    public void onSuccess(@NonNull String accessToken) {
+                        if (isFinishing()) {
+                            return;
+                        }
+                        // Same fields the former RetrieveTokenTask path set; request body unchanged.
+                        emailStr = email;
+                        isGoogleLogin = true;
+                        googleAccessToken = accessToken;
+                        loginWithGoogle(emailStr, "");
+                    }
+
+                    @Override
+                    public void onCancelled() {
+                        if (isFinishing()) {
+                            return;
+                        }
+                        dialogLoader.hideProgressDialog();
+                    }
+
+                    @Override
+                    public void onError(@NonNull String message) {
+                        if (isFinishing()) {
+                            return;
+                        }
+                        dialogLoader.hideProgressDialog();
+                        Toast.makeText(context, "Google sign-in failed. Please try again.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-    );
+
+            @Override
+            public void onCancelled() {
+                // Nothing to do.
+            }
+
+            @Override
+            public void onNoAccount() {
+                if (isFinishing()) {
+                    return;
+                }
+                Toast.makeText(context, "No Google account found on this device. Please add a Google account in Settings.", Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onError(@NonNull String message) {
+                if (isFinishing()) {
+                    return;
+                }
+                Toast.makeText(context, "Google sign-in failed. Please try again.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
     private void initKidsAgeList() {
         kidsAgeList = new ArrayList<>();
@@ -506,46 +490,6 @@ public class Login extends BaseActivity {
         }
     }
 
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleSignInResult(task);
-        }
-    }
-
-    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
-            // Signed in successfully, show authenticated UI.
-            if (account != null) {
-                if (account.getEmail() != null) {
-                    emailStr = account.getEmail();
-                    //loginWithGoogle(emailStr, "");
-                    isGoogleLogin = true;
-                    dialogLoader.showProgressDialog();
-                    new RetrieveTokenTask().execute(emailStr);
-                }
-            }
-        } catch (ApiException e) {
-            // The ApiException status code indicates the detailed failure reason.
-            // Please refer to the GoogleSignInStatusCodes class reference for more information.
-        }
-    }
-
-    private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
-        if (result.isSuccess()) {
-            final GoogleSignInAccount acct = result.getSignInAccount();
-            assert acct != null;
-            emailStr = acct.getEmail();
-            //loginWithGoogle(emailStr, "");
-            new RetrieveTokenTask().execute(emailStr);
-        }
-    }
 
 
     // CHECK USER EXISTS OR NOT API CALL
@@ -1150,7 +1094,6 @@ public class Login extends BaseActivity {
                 jsonObject.addProperty(Consts.google_access_token, googleAccessToken);
                 jsonObject.addProperty(Consts.device_gcm_token, CustomDashboardApplication.getString(context, Consts.firebase_token));
                 jsonObject.addProperty(Consts.age_group, ageGroupId);
-                Log.e("respObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.loginWithGoogle(jsonObject);
@@ -1162,7 +1105,6 @@ public class Login extends BaseActivity {
                         if (response.code() == 200 || response.code() == 201) {
                             if (response.body() != null) {
                                 String responseString = response.body().toString();
-                                Log.e("respCounter", response.body().toString());
                                 CustomDashboardApplication.setString(context, Consts.profile_data, responseString);
                                 try {
                                     final JSONObject jsonObject = new JSONObject(responseString);
@@ -1413,36 +1355,6 @@ public class Login extends BaseActivity {
         alertDialogProfileName.show();
     }
 
-
-    private class RetrieveTokenTask extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-            String accountName = params[0];
-            String scopes = "oauth2:profile email";
-            String token = null;
-            try {
-                token = GoogleAuthUtil.getToken(getApplicationContext(), accountName, scopes);
-            } catch (UserRecoverableAuthException e) {
-                startActivityForResult(e.getIntent(), RC_SIGN_IN);
-            } catch (IOException | GoogleAuthException e) {
-                e.printStackTrace();
-                if (e.getMessage() != null)
-                    Log.e(TAG, e.getMessage());
-            }
-            return token;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-            //sdialog.dismiss();
-            Log.e("google_token", s);
-            googleAccessToken = s;
-
-            loginWithGoogle(emailStr, "");
-        }
-    }
 
     private void showNewUserRegisterDialog() {
         try {
