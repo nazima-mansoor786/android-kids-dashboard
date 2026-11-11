@@ -97,12 +97,10 @@ import com.google.android.gms.location.LocationServices;
 import com.google.firebase.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
 import com.rsb.vpnpoc.MySingletonClass;
 import com.rsb.vpnpoc.VPNService;
-import com.squareup.picasso.Picasso;
 import com.tabnova.aidashboard.Adapter.RecyclerViewAdapter;
 //import com.tabnova.aidashboard.BuildConfig;
 import com.tabnova.aidashboard.CustomDashboardApplication;
@@ -219,8 +217,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     public static Button btnStart;
 
     // IMAGE LOADER
-    public static ImageLoader imageLoader;
-    public static DisplayImageOptions options;
 
     // ARRAY LIST
     public static ArrayList<AppModel> lstBook;
@@ -342,15 +338,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
 
         final String manufacturer = android.os.Build.MANUFACTURER;
         Log.e("manufacture", manufacturer);
-
-        imageLoader = ImageLoader.getInstance();
-        options = new DisplayImageOptions.Builder()
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .imageScaleType(ImageScaleType.EXACTLY)
-                .considerExifParams(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
 
         myRv = findViewById(R.id.recyclerview_id);
 
@@ -796,7 +783,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                     // UPDATE BACK GROUND IMAGE
                     if (CustomDashboardApplication.getString(context, Consts.IMG_FILE).startsWith("http")) {
                         String contentURI = CustomDashboardApplication.getString(context, Consts.IMG_FILE);
-                        imageLoader.displayImage(contentURI, ivBg, options);
+                        Glide.with(MainActivity.this).load(contentURI).format(DecodeFormat.PREFER_RGB_565).into(ivBg);
                     }
 
                     // SET SECURE WEB VIEW
@@ -3987,7 +3974,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                 if (!CustomDashboardApplication.getString(context, Consts.IMG_FILE).equalsIgnoreCase("")) {
                     if (CustomDashboardApplication.getString(context, Consts.IMG_FILE).startsWith("http")) {
                         String contentURI = CustomDashboardApplication.getString(context, Consts.IMG_FILE);
-                        Picasso.with(context).load(contentURI).into(ivBg);
+                        Glide.with(context).load(contentURI).format(DecodeFormat.PREFER_RGB_565).into(ivBg);
                         //imageLoader.displayImage(contentURI, ivBg, options);
                     } else {
                         final Uri contentURI = Uri.parse(CustomDashboardApplication.getString(context, Consts.IMG_FILE));
@@ -4007,7 +3994,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                 if (!CustomDashboardApplication.getString(context, Consts.IMG_FILE).equalsIgnoreCase("")) {
                     if (CustomDashboardApplication.getString(context, Consts.IMG_FILE).startsWith("http")) {
                         String contentURI = CustomDashboardApplication.getString(context, Consts.IMG_FILE);
-                        Picasso.with(context).load(contentURI).into(ivBg);
+                        Glide.with(context).load(contentURI).format(DecodeFormat.PREFER_RGB_565).into(ivBg);
                         //imageLoader.displayImage(contentURI, ivBg, options);
                     } else {
                         final Uri contentURI = Uri.parse(CustomDashboardApplication.getString(context, Consts.IMG_FILE));

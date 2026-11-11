@@ -65,9 +65,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.tabnova.aidashboard.Activity.AppPermissionsActivity;
 import com.tabnova.aidashboard.Activity.CustomDashboardSettings;
 import com.tabnova.aidashboard.Activity.FakeActivity;
@@ -108,7 +105,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
 
 
     //private static Application mInstance;
-    private ImageLoaderConfiguration mImageLoader;
 
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -147,7 +143,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
     public void onCreate() {
         super.onCreate();
         mInstance = this;
-        initImageLoader(getApplicationContext());
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
 
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -846,23 +841,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
    /* public static Application getInstance() {
         return mInstance;
     }*/
-
-    public static void initImageLoader(Context context) {
-        // This configuration tuning is custom. You can tune every option, you may tune some of them,
-        // or you can create default configuration by
-        //  ImageLoaderConfiguration.createDefault(this);
-        // method.
-        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(context);
-        config.threadPriority(Thread.NORM_PRIORITY - 2);
-        config.denyCacheImageMultipleSizesInMemory();
-        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-        config.diskCacheSize(50 * 1024 * 1024); // 50 MiB
-        config.tasksProcessingOrder(QueueProcessingType.LIFO);
-        config.writeDebugLogs(); // Remove for release app
-
-        // Initialize ImageLoader with configuration.
-        com.nostra13.universalimageloader.core.ImageLoader.getInstance().init(config.build());
-    }
 
     public static boolean isAccessGranted(Context context) {
         try {
