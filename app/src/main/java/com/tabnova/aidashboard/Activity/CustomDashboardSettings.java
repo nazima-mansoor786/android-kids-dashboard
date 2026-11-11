@@ -8930,13 +8930,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     }
 
     public void startScreenCapture() {
-        Intent intent = new Intent(this, MediaProjectionService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        } else {
-            startService(intent);
-        }
-
+        // Consent first. MediaProjectionService is started only after RESULT_OK.
         MediaProjectionManager mediaProjectionManager =
                 (MediaProjectionManager) getApplication().getSystemService(
                         Context.MEDIA_PROJECTION_SERVICE);
@@ -8946,14 +8940,16 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     ActivityResultLauncher<Intent> mediaProjectionResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
+                if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                     // There are no request codes
                     Log.e(TAG, "Screen Share Started.");
-                    StartStopScreenShare.mMediaProjectionPermissionResultCode = result.getResultCode();
-                    StartStopScreenShare.mMediaProjectionPermissionResultData = result.getData();
-                    StartStopScreenShare.context = context;
                     StartStopScreenShare.portNumber = portNumber;
-                    StartStopScreenShare.start();
+                    Intent intent = new Intent(getApplicationContext(), MediaProjectionService.class);
+                    intent.putExtra(MediaProjectionService.EXTRA_RESULT_CODE, result.getResultCode());
+                    intent.putExtra(MediaProjectionService.EXTRA_RESULT_DATA, result.getData());
+                    ContextCompat.startForegroundService(getApplicationContext(), intent);
+                } else {
+                    StartStopScreenShare.clearConsent();
                 }
             });
 }

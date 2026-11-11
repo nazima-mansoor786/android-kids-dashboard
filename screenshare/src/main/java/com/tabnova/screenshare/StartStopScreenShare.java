@@ -5,8 +5,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.projection.MediaProjection;
-import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -54,6 +54,10 @@ public class StartStopScreenShare {
     static AudioSource audioSource;
     static AudioTrack localAudioTrack;
     static SurfaceTextureHelper surfaceTextureHelper;
+    static VideoCapturer videoCapturer;
+    private static volatile boolean sessionActive;
+    private static volatile int captureSessionId;
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public static PeerConnection localPeer;
     static List<IceServer> iceServers;
@@ -125,7 +129,14 @@ public class StartStopScreenShare {
         });
     }
 
-    public static void start() {
+    /**
+     * Starts a screen-share session. Called only by MediaProjectionService after it is in the
+     * foreground with type mediaProjection, using a fresh consent result (single use).
+     */
+    static void start(int resultCode, Intent resultData) {
+        mMediaProjectionPermissionResultCode = resultCode;
+        mMediaProjectionPermissionResultData = resultData;
+        sessionActive = true;
         Log.e(TAG, "start: " + portNumber);
         SignallingClient.getInstance().initroomname(portNumber);
         initVideos();
@@ -152,6 +163,7 @@ public class StartStopScreenShare {
         VideoCapturer videoCapturerAndroid;
         //    videoCapturerAndroid = createCameraCapturer(new Camera1Enumerator(false));
         videoCapturerAndroid = createScreenCapture();
+        videoCapturer = videoCapturerAndroid;
 
         //Create MediaConstraints - Will be useful for specifying video and audio constraints.
         audioConstraints = new MediaConstraints();
@@ -178,14 +190,6 @@ public class StartStopScreenShare {
             signalingInterface.onTryToStart();
         }
 
-        Intent svc = new Intent(context, MediaProjectionService.class);
-        // Intent svc = new Intent(this, mousemove.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(svc);
-        } else {
-            context.startService(svc);
-        }
-
         SignallingClient.getInstance().init(signalingInterface);
     }
 
@@ -194,11 +198,21 @@ public class StartStopScreenShare {
             showToast("User didn't give permission to capture the screen.");
             return null;
         }
+        final int sessionId = ++captureSessionId;
+        Intent resultData = mMediaProjectionPermissionResultData;
+        // The consent token is single use: clear it as soon as it is handed to the capturer.
+        clearConsent();
         return new ScreenCapturerAndroid(
-                mMediaProjectionPermissionResultData, new MediaProjection.Callback() {
+                resultData, new MediaProjection.Callback() {
             @Override
             public void onStop() {
                 showToast("User revoked permission to capture the screen.");
+                // Only end the session when the current projection was stopped by the user or system,
+                // not when closeSession() stopped it on purpose. Off the capture thread, because
+                // hangup() blocks while signalling closes.
+                if (sessionActive && sessionId == captureSessionId) {
+                    new Thread(StartStopScreenShare::hangup).start();
+                }
             }
         });
     }
@@ -285,15 +299,37 @@ public class StartStopScreenShare {
         SignallingClient.getInstance().emitIceCandidate(iceCandidate);
     }
 
-    public static void hangup() {
+    public static synchronized void hangup() {
         try {
             /*context.stopService(new Intent(context, MediaProjectionService.class));
             setStatus("Call closed");
             */
 
-            if (isMyServiceRunning(MediaProjectionService.class)) {
+            closeSession();
+            if (context != null && isMyServiceRunning(MediaProjectionService.class)) {
                 context.stopService(new Intent(context, MediaProjectionService.class));
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /** True between start() and closeSession(). */
+    public static boolean isSessionActive() {
+        return sessionActive;
+    }
+
+    /**
+     * Ends the current session: stops capture, then closes signalling and the peer connection.
+     * Does not stop MediaProjectionService. Safe to call more than once.
+     */
+    public static synchronized void closeSession() {
+        if (!sessionActive) {
+            return;
+        }
+        sessionActive = false;
+        releaseCapture();
+        try {
             if (SignallingClient.getInstance() != null) {
                 SignallingClient.getInstance().isStarted = false;
                 SignallingClient.getInstance().close();
@@ -308,17 +344,42 @@ public class StartStopScreenShare {
         }
     }
 
-    public static void showToast(final String msg) {
-        if (context instanceof Activity) {
-            if (!((Activity) context).isFinishing() && !((Activity) context).isDestroyed()) {
-                ((Activity) context).runOnUiThread(() -> {
-                    Log.e(TAG, "showToast: " + msg);
-                    //if (BuildConfig.DEBUG) {
-                        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
-                   // }
-                });
+    /** Stops and disposes the screen capturer (ends the MediaProjection) and clears the consent token. */
+    private static void releaseCapture() {
+        if (videoCapturer != null) {
+            try {
+                videoCapturer.stopCapture();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            } catch (RuntimeException e) {
+                e.printStackTrace();
             }
+            videoCapturer.dispose();
+            videoCapturer = null;
         }
+        if (surfaceTextureHelper != null) {
+            surfaceTextureHelper.dispose();
+            surfaceTextureHelper = null;
+        }
+        clearConsent();
+    }
+
+    /** Discards any stored MediaProjection consent result (deny, hangup, or after single use). */
+    public static void clearConsent() {
+        mMediaProjectionPermissionResultCode = 0;
+        mMediaProjectionPermissionResultData = null;
+    }
+
+    public static void showToast(final String msg) {
+        if (context == null) {
+            return;
+        }
+        mainHandler.post(() -> {
+            Log.e(TAG, "showToast: " + msg);
+            //if (BuildConfig.DEBUG) {
+                Toast.makeText(context.getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+           // }
+        });
     }
 
     public static void setStatus(final String msg) {
@@ -329,30 +390,26 @@ public class StartStopScreenShare {
         @Override
         public void onRemoteHangUp(String msg) {
             Log.e(TAG, "onRemoteHangUp: " + msg);
-            if (context instanceof Activity) {
-                ((Activity) context).runOnUiThread(StartStopScreenShare::hangup);
-            }
+            mainHandler.post(StartStopScreenShare::hangup);
         }
 
         @Override
         public void onOfferReceived(JSONObject data) {
             Log.e(TAG, "onOfferReceived: ");
-            if (context instanceof Activity) {
-                showToast("Received Offer");
-                ((Activity) context).runOnUiThread(() -> {
-                    if (!SignallingClient.getInstance().isInitiator && !SignallingClient.getInstance().isStarted) {
-                        onTryToStart();
-                    }
+            showToast("Received Offer");
+            mainHandler.post(() -> {
+                if (!SignallingClient.getInstance().isInitiator && !SignallingClient.getInstance().isStarted) {
+                    onTryToStart();
+                }
 
-                    try {
-                        localPeer.setRemoteDescription(new CustomSdpObserver("localSetRemote"), new SessionDescription(SessionDescription.Type.OFFER, data.getString("sdp")));
-                        doAnswer();
-                        //   updateVideoViews(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                });
-            }
+                try {
+                    localPeer.setRemoteDescription(new CustomSdpObserver("localSetRemote"), new SessionDescription(SessionDescription.Type.OFFER, data.getString("sdp")));
+                    doAnswer();
+                    //   updateVideoViews(true);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            });
         }
 
         @Override
@@ -380,21 +437,19 @@ public class StartStopScreenShare {
         @Override
         public void onTryToStart() {
             Log.e(TAG, "onTryToStart: ");
-            if (context instanceof Activity) {
-                ((Activity) context).runOnUiThread(() -> {
-                    if (!SignallingClient.getInstance().isStarted && localVideoTrack != null && SignallingClient.getInstance().isChannelReady) {
-                        createPeerConnection();
-                        SignallingClient.getInstance().isStarted = true;
-                        //  if (SignallingClient.getInstance().isInitiator) {
+            mainHandler.post(() -> {
+                if (!SignallingClient.getInstance().isStarted && localVideoTrack != null && SignallingClient.getInstance().isChannelReady) {
+                    createPeerConnection();
+                    SignallingClient.getInstance().isStarted = true;
+                    //  if (SignallingClient.getInstance().isInitiator) {
+                    doCall();
+                    //  }
+                } else {
+                    if (SignallingClient.getInstance().isStarted && localVideoTrack != null && SignallingClient.getInstance().isChannelReady) {
                         doCall();
-                        //  }
-                    } else {
-                        if (SignallingClient.getInstance().isStarted && localVideoTrack != null && SignallingClient.getInstance().isChannelReady) {
-                            doCall();
-                        }
                     }
-                });
-            }
+                }
+            });
         }
 
         @Override
