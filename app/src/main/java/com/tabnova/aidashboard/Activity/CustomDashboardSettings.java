@@ -90,18 +90,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.billingclient.api.AcknowledgePurchaseParams;
-import com.android.billingclient.api.BillingClient;
-import com.android.billingclient.api.BillingClientStateListener;
-import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
-import com.android.billingclient.api.ConsumeParams;
-import com.android.billingclient.api.ConsumeResponseListener;
-import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchaseHistoryRecord;
-import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -133,6 +121,7 @@ import com.tabnova.aidashboard.Adapter.WebCookiesListAdapter;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Extra.APIManager;
 import com.tabnova.aidashboard.Extra.ApkInfoExtractor;
+import com.tabnova.aidashboard.Extra.BillingManager;
 import com.tabnova.aidashboard.Extra.Consts;
 import com.tabnova.aidashboard.Extra.DialogLoader;
 import com.tabnova.aidashboard.Extra.NetConnectivity;
@@ -200,7 +189,7 @@ import retrofit2.Retrofit;
 
 public class CustomDashboardSettings extends BaseActivity implements SettingsAppsAdapter.OnSettingSelectListner, SettingsAdapter.OnSettingSelectListner,
         UninstallAppsListAdapter.OnAppSelectListener, ClearAppsDataListAdapter.OnClearAppSelectListener,
-        PurchasesUpdatedListener, OnResponseListener, ScheduleAdapter.OnScheduleSelectListner, ScheduleEventListAdapter.OnEventSelectListner,
+        OnResponseListener, ScheduleAdapter.OnScheduleSelectListner, ScheduleEventListAdapter.OnEventSelectListner,
         AddedWebShortcutsAdapter.OnShortcutsSelectListener, CallLogsListAdapter.OnCallLogSelectListener, WebCookiesListAdapter.OnWebCookieSelectListener,
         DeletePredefineFileFolderListAdapter.OnDeletePreFileFolderListener, DeleteFileFolderListAdapter.OnDeleteFileFolderListener,
         PreDefineListAdapter.OnPreDefineSelectListener, FileModelListAdapter.OnSelectListener {
@@ -364,9 +353,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     // GOOGLE API CLIENT
     private GoogleApiClient mGoogleApiClient;
 
-    // BILLING CLIENT
-    private BillingClient billingClient;
-
     // BUTTON
     private Button btnDashBoard;
     private Button btnLogin;
@@ -424,9 +410,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
     // STRING BUILDER
     StringBuilder mainSb = new StringBuilder();
-
-    private String purchaseToken = "";
-    private String purchaseTime = "";
 
     private ActivityResultLauncher<PickVisualMediaRequest> pickMediaLauncher;
 
@@ -3309,14 +3292,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
         LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver2);
         LocalBroadcastManager.getInstance(context).unregisterReceiver(fetchAppDetailsReceiver);
 
-        try {
-            if (billingClient != null) {
-                billingClient.endConnection();
-                billingClient = null;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        BillingManager.getInstance().clearListener(purchaseListener);
     }
 
     private void showLoginToolTip() {
@@ -4634,11 +4610,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
         if (requestCode == Consts.APP_SELECTION && resultCode == Activity.RESULT_OK) {
             if (data != null && data.getExtras() != null && data.getExtras().getBoolean(Consts.is_launch_billing)) {
-                if (billingClient != null && billingClient.isReady()) {
-                    launchBillingFlow();
-                } else {
-                    setUpBillingConnection(getString(R.string.website_block));
-                }
+                startPurchase();
             }
         }
 
@@ -4769,234 +4741,54 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
         }
     }
 
-    private void setUpBillingConnection(String from) {
-        if (billingClient != null && billingClient.isReady()) {
-            queryPurchaseHistory();
-        } else {
-            setupBillingClient();
+    private final BillingManager.PurchaseListener purchaseListener = new BillingManager.PurchaseListener() {
+        @Override
+        public void onPurchaseSuccess() {
+            if (isFinishing()) {
+                return;
+            }
+            Toast.makeText(context, "Product purchased. You can use all premium features now.", Toast.LENGTH_SHORT).show();
         }
+
+        @Override
+        public void onPurchasePending() {
+            if (isFinishing()) {
+                return;
+            }
+            Toast.makeText(context, "Payment is pending. Premium will activate once payment is complete.", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void onPurchaseCancelled() {
+            // Nothing to do; entitlement unchanged.
+        }
+
+        @Override
+        public void onPurchaseError(int responseCode, @Nullable String message) {
+            if (isFinishing()) {
+                return;
+            }
+            Toast.makeText(context, "Purchase could not be completed. Please try again.", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    /** Explicit Buy taps only: re-check entitlement first; launch the purchase flow only if not subscribed. */
+    private void startPurchase() {
+        BillingManager.getInstance().refreshEntitlement((queried, entitled) -> {
+            if (isFinishing()) {
+                return;
+            }
+            if (!(queried && entitled)) {
+                BillingManager.getInstance().launchPurchase(CustomDashboardSettings.this, purchaseListener);
+            }
+        });
+    }
+
+    /** Website Block / App Block options: open the block screen (it refreshes entitlement itself). */
+    private void openBlockDomainScreen(String from) {
         Intent intent = new Intent(CustomDashboardSettings.this, BlockDomainActivity.class);
         intent.putExtra(Consts.type, from);
         startActivity(intent);
-    }
-
-    private void setupBillingClient() {
-        CustomDashboardApplication.isBillingLaunched = true;
-        isHomeApp = 1;
-        billingClient = BillingClient.newBuilder(context).enablePendingPurchases().setListener(this).build();
-        billingClient.startConnection(new BillingClientStateListener() {
-            @Override
-            public void onBillingSetupFinished(@NonNull BillingResult billingResult) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    if (billingClient.isReady()) {
-                        queryPurchaseHistory();
-                    } else {
-                        CustomDashboardApplication.isBillingLaunched = false;
-                        runOnUiThread(() -> Toast.makeText(context, "Billing client not ready", Toast.LENGTH_SHORT).show());
-                    }
-                } else {
-                    CustomDashboardApplication.isBillingLaunched = false;
-
-                    runOnUiThread(() -> Toast.makeText(context, "Failed to connect billing" + billingResult.getResponseCode(), Toast.LENGTH_SHORT).show());
-                }
-            }
-
-            @Override
-            public void onBillingServiceDisconnected() {
-                CustomDashboardApplication.isBillingLaunched = false;
-                runOnUiThread(() -> Toast.makeText(context, "You are disconnect from billing", Toast.LENGTH_SHORT).show());
-            }
-        });
-    }
-
-    private void queryPurchaseHistory() {
-        isHomeApp = 1;
-        QueryPurchaseHistoryParams queryPurchaseHistoryParams = QueryPurchaseHistoryParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build();
-        billingClient.queryPurchaseHistoryAsync(queryPurchaseHistoryParams, (client, purchasesList) -> {
-            if (client.getResponseCode() == BillingClient.BillingResponseCode.OK && purchasesList != null && purchasesList.size() > 0) {
-                boolean isProductFound = false;
-                for (PurchaseHistoryRecord purchase : purchasesList) {
-                    Log.e(TAG, "queryPurchaseHistoryAsync : " + new Gson().toJson(purchase));
-                    if (!TextUtils.isEmpty(purchase.getOriginalJson())) {
-                        try {
-                            Log.e(TAG, "onBillingSetupFinished: Purchase JSON " + purchase.getOriginalJson());
-                            JSONObject jObj = new JSONObject(purchase.getOriginalJson());
-                            if (Utils.contains(jObj, Consts.productId)) {
-                                if (jObj.getString(Consts.productId).equalsIgnoreCase(Consts.subscriptionId)) {
-                                    purchaseToken = purchase.getPurchaseToken();
-                                    purchaseTime = String.valueOf(purchase.getPurchaseTime());
-
-                                    sessionManager.setPurchaseToken(purchaseToken);
-                                    sessionManager.setPurchaseTime(purchaseTime);
-                                }
-
-                                isProductFound = true;
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-
-                sessionManager.setIsSubscriptionEnabled(isProductFound);
-            }
-        });
-    }
-
-    private void launchBillingFlow() {
-        try {
-            runOnUiThread(() -> Toast.makeText(CustomDashboardSettings.this, "Billing process is under development.", Toast.LENGTH_SHORT).show());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        isHomeApp = 1;
-        List<QueryProductDetailsParams.Product> skuList = new ArrayList<>();
-        QueryProductDetailsParams.Product product = QueryProductDetailsParams.Product.newBuilder().setProductId(Consts.subscriptionId).setProductType(BillingClient.ProductType.SUBS).build();
-        skuList.add(product);
-        QueryProductDetailsParams queryProductDetailsParams = QueryProductDetailsParams.newBuilder().setProductList(skuList).build();
-        billingClient.queryProductDetailsAsync(queryProductDetailsParams, (billingResult, skuDetailsList) -> {
-            Log.e(TAG, "onSkuDetailsResponse: ");
-            if (skuDetailsList.size() > 0) {
-                if (skuDetailsList.get(0).getProductId().equalsIgnoreCase(Consts.subscriptionId)) {
-                    Log.e(TAG, "launchBillingFlow: Product ID Same. Process for billing.");
-                    List<BillingFlowParams.ProductDetailsParams> productDetailsParams = new ArrayList<>();
-                    if (skuDetailsList.get(0).getSubscriptionOfferDetails() != null && skuDetailsList.get(0).getSubscriptionOfferDetails().size() > 0 &&
-                            !TextUtils.isEmpty(skuDetailsList.get(0).getSubscriptionOfferDetails().get(0).getOfferToken())) {
-                        Log.e(TAG, "launchBillingFlow: Offer Token : " + skuDetailsList.get(0).getSubscriptionOfferDetails().get(0).getOfferToken());
-                        productDetailsParams.add(BillingFlowParams.ProductDetailsParams.newBuilder()
-                                // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
-                                .setProductDetails(skuDetailsList.get(0))
-                                .setOfferToken(skuDetailsList.get(0).getSubscriptionOfferDetails().get(0).getOfferToken())
-                                // to get an offer token, call ProductDetails.getSubscriptionOfferDetails()
-                                // for a list of offers that are available to the user
-                                .build());
-                    } else {
-                        productDetailsParams.add(BillingFlowParams.ProductDetailsParams.newBuilder()
-                                // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
-                                .setProductDetails(skuDetailsList.get(0))
-                                // to get an offer token, call ProductDetails.getSubscriptionOfferDetails()
-                                // for a list of offers that are available to the user
-                                .build());
-                    }
-
-                    BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                            .setProductDetailsParamsList(productDetailsParams)
-                            .build();
-
-                    isHomeApp = 1;
-                    Log.e(TAG, "launchBillingFlow: Launching billing flow.");
-                    billingClient.launchBillingFlow(CustomDashboardSettings.this, billingFlowParams);
-                }
-            }
-        });
-    }
-
-
-    @Override
-    public void onPurchasesUpdated(BillingResult billingResult, @Nullable List<Purchase> purchases) {
-        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && purchases != null && purchases.size() > 0) {
-            Toast.makeText(context, "Purchase item: " + purchases.size(), Toast.LENGTH_SHORT).show();
-            sessionManager.setIsSubscriptionEnabled(true);
-            for (Purchase purchase : purchases) {
-                handlePurchase(purchase);
-            }
-        } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-            // Handle an error caused by a user cancelling the purchase flow.
-            Log.e(TAG, "onPurchasesUpdated: USER_CANCELED");
-            Toast.makeText(context, "Purchase cancelled.", Toast.LENGTH_SHORT).show();
-            sessionManager.setIsSubscriptionEnabled(false);
-            CustomDashboardApplication.isBillingLaunched = false;
-            if (billingClient != null) {
-                billingClient.endConnection();
-                billingClient = null;
-            }
-        } else {
-            Log.e(TAG, "onPurchasesUpdated" + billingResult.getResponseCode());
-            sessionManager.setIsSubscriptionEnabled(false);
-            CustomDashboardApplication.isBillingLaunched = false;
-            if (billingClient != null) {
-                billingClient.endConnection();
-                billingClient = null;
-            }
-            // Toast.makeText(context, "onPurchasesUpdated: " + billingResult.getResponseCode(), Toast.LENGTH_SHORT).show();
-            // Handle any other error codes.
-        }
-    }
-
-    private void handlePurchase(Purchase purchase) {
-        if (BuildConfig.DEBUG) {
-            runOnUiThread(() -> Toast.makeText(context, "handlePurchase: " + purchase.getPackageName(), Toast.LENGTH_SHORT).show());
-        }
-        Log.e(TAG, "handlePurchase: " + purchase.getPackageName() + " : " + purchase.getPurchaseToken());
-        Log.e(TAG, "handlePurchase: Purchase Time : " + purchase.getPurchaseTime());
-        Log.e(TAG, "handlePurchase: Purchase JSON : " + new Gson().toJson(purchase));
-
-        if (!TextUtils.isEmpty(purchase.getOriginalJson())) {
-            try {
-                JSONObject jObj = new JSONObject(purchase.getOriginalJson());
-                if (Utils.contains(jObj, Consts.productId) && jObj.getString(Consts.productId).equalsIgnoreCase(Consts.subscriptionId)) {
-                    purchaseToken = purchase.getPurchaseToken();
-                    purchaseTime = String.valueOf(purchase.getPurchaseTime());
-
-                    sessionManager.setPurchaseToken(purchase.getPurchaseToken());
-                    sessionManager.setPurchaseTime(String.valueOf(purchase.getPurchaseTime()));
-
-                    runOnUiThread(() -> Toast.makeText(context, "Product purchased. You can use block domains now.", Toast.LENGTH_SHORT).show());
-
-                    ConsumeParams consumeParams =
-                            ConsumeParams.newBuilder()
-                                    .setPurchaseToken(purchase.getPurchaseToken())
-                                    .build();
-
-                    ConsumeResponseListener listener = (billingResult, purchaseToken) -> {
-                        Log.e(TAG, "onConsumeResponse: " + billingResult.getResponseCode());
-                        AcknowledgePurchaseParams acknowledgePurchaseParams =
-                                AcknowledgePurchaseParams.newBuilder()
-                                        .setPurchaseToken(purchase.getPurchaseToken())
-                                        .build();
-                        billingClient.acknowledgePurchase(acknowledgePurchaseParams, result -> {
-                            Log.e(TAG, "handlePurchase: ");
-                            if (result.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                Log.e(TAG, "handlePurchase: Product Acknowledged.");
-                            }
-                        });
-                    };
-
-                    billingClient.consumeAsync(consumeParams, listener);
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-                if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-                    if (!purchase.isAcknowledged()) {
-                        AcknowledgePurchaseParams acknowledgePurchaseParams =
-                                AcknowledgePurchaseParams.newBuilder()
-                                        .setPurchaseToken(purchase.getPurchaseToken())
-                                        .build();
-                        billingClient.acknowledgePurchase(acknowledgePurchaseParams, result -> {
-                            Log.e(TAG, "handlePurchase: ");
-                            if (result.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                                Log.e(TAG, "handlePurchase: Product Acknowledged.");
-                            }
-                        });
-                    }
-                }
-            }
-        } else {
-            if (purchase.getPurchaseState() == Purchase.PurchaseState.PURCHASED) {
-                if (!purchase.isAcknowledged()) {
-                    AcknowledgePurchaseParams acknowledgePurchaseParams =
-                            AcknowledgePurchaseParams.newBuilder()
-                                    .setPurchaseToken(purchase.getPurchaseToken())
-                                    .build();
-                    billingClient.acknowledgePurchase(acknowledgePurchaseParams, result -> {
-                        Log.e(TAG, "handlePurchase: ");
-                        if (result.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                            Log.e(TAG, "handlePurchase: Product Acknowledged.");
-                        }
-                    });
-                }
-            }
-        }
     }
 
     @Override
@@ -5057,7 +4849,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                         showUnInstallApplicationDialog();
                     }
                 } else {
-                    setUpBillingConnection(getString(R.string.website_block));
+                    openBlockDomainScreen(getString(R.string.website_block));
                 }
             } else if (pos == 7) {
                 if (CustomDashboardApplication.isDeviceSamsung()) {
@@ -5072,11 +4864,11 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                         }
                     } else {
                         //if (SuperLockState.getInstance(context).isESDKLicenseActivated()) {
-                        setUpBillingConnection(getString(R.string.website_block));
+                        openBlockDomainScreen(getString(R.string.website_block));
                         //}
                     }
                 } else {
-                    setUpBillingConnection(getString(R.string.app_block));
+                    openBlockDomainScreen(getString(R.string.app_block));
                 }
             } else if (pos == 8) {
                 if (CustomDashboardApplication.isDeviceSamsung()) {
@@ -5086,7 +4878,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                         }
                     } else {
                         if (SuperLockState.getInstance(context).isESDKLicenseActivated()) {
-                            setUpBillingConnection(getString(R.string.app_block));
+                            openBlockDomainScreen(getString(R.string.app_block));
                         }
                     }
                 }
@@ -5098,13 +4890,13 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                         }
                     } else {
                         //if (SuperLockState.getInstance(context).isESDKLicenseActivated()) {
-                        setUpBillingConnection(getString(R.string.website_block));
+                        openBlockDomainScreen(getString(R.string.website_block));
                         //}
                     }
                 }
             } else if (pos == 10) {
                 //if (SuperLockState.getInstance(context).isESDKLicenseActivated()) {
-                setUpBillingConnection(getString(R.string.app_block));
+                openBlockDomainScreen(getString(R.string.app_block));
                 //}
             }
         } else if (type == 1) {
@@ -8743,11 +8535,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                             alertDialogAdvanceSettings.dismiss();
                         }
 
-                        if (billingClient != null && billingClient.isReady()) {
-                            launchBillingFlow();
-                        } else {
-                            setUpBillingConnection(getString(R.string.website_block));
-                        }
+                        startPurchase();
                     }
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
