@@ -383,7 +383,8 @@
         <service
             android:name="com.tabnova.screenshare.MediaProjectionService"
             android:enabled="true"
-            android:exported="true" />
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
         <activity
             android:name="com.tabnova.screenshare.MainActivity"

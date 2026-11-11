@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -12,6 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ServiceCompat;
 
 public class MediaProjectionService extends Service {
 
@@ -47,7 +49,8 @@ public class MediaProjectionService extends Service {
             manager.createNotificationChannel(notificationChannel);
         }
 
-        startForeground(100, notification.build());
+        ServiceCompat.startForeground(this, 100, notification.build(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
     }
 
     @Override
