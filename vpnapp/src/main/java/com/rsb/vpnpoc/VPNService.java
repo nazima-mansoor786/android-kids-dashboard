@@ -7,6 +7,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ServiceCompat;
 
 import com.rsb.vpnpoc.packetRebuild.PCapFileWriter;
 import com.rsb.vpnpoc.socket.IProtectSocket;
@@ -83,7 +85,8 @@ public class VPNService extends VpnService implements Handler.Callback,
             manager.createNotificationChannel(notificationChannel);
         }
 
-        startForeground(100, notification.build());
+        ServiceCompat.startForeground(this, 100, notification.build(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SYSTEM_EXEMPTED);
     }
 
     @Override
