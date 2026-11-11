@@ -102,7 +102,7 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:21.3.0'
 
     // GOOGLE PLAY BILLING LIBRARY
-    implementation 'com.android.billingclient:billing:7.0.0'
+    implementation 'com.android.billingclient:billing:8.3.0'
 
     // WORK MANAGER LIBRARY
     // 2.12.0+ requires minSdk 24; 2.11.x is the latest line supporting minSdk 23.

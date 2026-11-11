@@ -21,7 +21,9 @@ import com.android.billingclient.api.ProductDetails;
 import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
+import com.android.billingclient.api.QueryProductDetailsResult;
 import com.android.billingclient.api.QueryPurchasesParams;
+import com.android.billingclient.api.UnfetchedProduct;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -32,8 +34,7 @@ import java.util.List;
  * Application-scoped Google Play Billing wrapper for the Consts.subscriptionId subscription.
  * <p>
  * All public methods may be called from any thread; all callbacks are delivered on the main thread.
- * Uses only APIs present in both Billing 7.0.0 and 8.x, except the product-details listener,
- * which is isolated in {@link #queryProductDetails(ProductDetailsCallback)}.
+ * Targets Play Billing Library 8.x (automatic service reconnection, QueryProductDetailsResult).
  * Never consumes subscriptions and never logs purchase tokens or purchase JSON.
  */
 public final class BillingManager implements PurchasesUpdatedListener {
@@ -84,8 +85,6 @@ public final class BillingManager implements PurchasesUpdatedListener {
     }
 
     private static final String TAG = "BillingManager";
-    private static final int MAX_RECONNECT_ATTEMPTS = 3;
-    private static final long BASE_RECONNECT_DELAY_MS = 1000L;
 
     private static final BillingManager INSTANCE = new BillingManager();
 
@@ -96,7 +95,6 @@ public final class BillingManager implements PurchasesUpdatedListener {
     private SessionManager sessionManager;
     private boolean debug;
     private boolean connecting;
-    private int reconnectAttempts;
     private WeakReference<PurchaseListener> listenerRef = new WeakReference<>(null);
 
     private BillingManager() {
@@ -120,6 +118,7 @@ public final class BillingManager implements PurchasesUpdatedListener {
                     .enablePendingPurchases(PendingPurchasesParams.newBuilder()
                             .enableOneTimeProducts()
                             .build())
+                    .enableAutoServiceReconnection()
                     .build();
         });
     }
@@ -349,8 +348,7 @@ public final class BillingManager implements PurchasesUpdatedListener {
     }
 
     /**
-     * The only place that depends on the Billing 7 ProductDetailsResponseListener signature
-     * (BillingResult, List&lt;ProductDetails&gt;). Billing 8 changes it to QueryProductDetailsResult.
+     * Billing 8 ProductDetailsResponseListener: (BillingResult, QueryProductDetailsResult).
      */
     private void queryProductDetails(@NonNull ProductDetailsCallback callback) {
         QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
@@ -360,8 +358,9 @@ public final class BillingManager implements PurchasesUpdatedListener {
                                 .setProductType(BillingClient.ProductType.SUBS)
                                 .build()))
                 .build();
-        billingClient.queryProductDetailsAsync(params, (billingResult, productDetailsList) -> {
+        billingClient.queryProductDetailsAsync(params, (billingResult, queryResult) -> {
             ProductDetails found = null;
+            List<ProductDetails> productDetailsList = queryResult != null ? queryResult.getProductDetailsList() : null;
             if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && productDetailsList != null) {
                 for (ProductDetails details : productDetailsList) {
                     if (Consts.subscriptionId.equals(details.getProductId())) {
@@ -371,6 +370,19 @@ public final class BillingManager implements PurchasesUpdatedListener {
                 }
             }
             logDebug("queryProductDetailsAsync: " + billingResult.getResponseCode() + ", found=" + (found != null));
+            if (debug && queryResult != null) {
+                List<UnfetchedProduct> unfetched = queryResult.getUnfetchedProductList();
+                if (unfetched != null && !unfetched.isEmpty()) {
+                    StringBuilder ids = new StringBuilder();
+                    for (UnfetchedProduct product : unfetched) {
+                        if (ids.length() > 0) {
+                            ids.append(", ");
+                        }
+                        ids.append(product.getProductId());
+                    }
+                    logDebug("queryProductDetailsAsync: unfetched=" + unfetched.size() + " [" + ids + "]");
+                }
+            }
             final ProductDetails result = found;
             mainHandler.post(() -> callback.onResult(result));
         });
@@ -433,22 +445,15 @@ public final class BillingManager implements PurchasesUpdatedListener {
     private void onSetupFinished(@NonNull BillingResult billingResult) {
         connecting = false;
         logDebug("onBillingSetupFinished: " + billingResult.getResponseCode());
-        reconnectAttempts = 0;
         drainPendingRequests(billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK);
     }
 
     private void onDisconnected() {
-        logDebug("onBillingServiceDisconnected, attempt " + reconnectAttempts);
-        if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-            long delay = BASE_RECONNECT_DELAY_MS * (1L << reconnectAttempts);
-            reconnectAttempts++;
-            connecting = true; // keep new requests queued while waiting to reconnect
-            mainHandler.postDelayed(this::connect, delay);
-        } else {
-            connecting = false;
-            reconnectAttempts = 0;
-            drainPendingRequests(false);
-        }
+        // Automatic service reconnection is enabled: do NOT call startConnection() here (per Play
+        // Billing docs). Fail anything still queued; later API calls reconnect automatically.
+        logDebug("onBillingServiceDisconnected");
+        connecting = false;
+        drainPendingRequests(false);
     }
 
     private void drainPendingRequests(boolean ready) {
