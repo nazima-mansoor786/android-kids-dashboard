@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import androidx.core.content.ContextCompat;
+
 import com.samsung.android.knox.license.EnterpriseLicenseManager;
 import com.samsung.android.knox.license.KnoxEnterpriseLicenseManager;
 import com.tabnova.aidashboard.R;
@@ -59,7 +61,8 @@ public class LicenseActivity extends Activity {
         filter.addAction(KnoxEnterpriseLicenseManager.ACTION_LICENSE_STATUS);
 
 
-        registerReceiver(mLicenseActivateReceiver, filter);
+        ContextCompat.registerReceiver(this, mLicenseActivateReceiver, filter,
+                ContextCompat.RECEIVER_EXPORTED);
 
 
 
