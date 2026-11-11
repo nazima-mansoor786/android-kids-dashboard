@@ -8,8 +8,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tabnova.aidashboard.CustomDashboardApplication;
@@ -80,11 +78,9 @@ public class LicensesProfileService extends Service {
 
         String test = Const.DEVICE_PROFILE_LICENCES + token;
 
-        EnhancedStringRequest myReq = new EnhancedStringRequest(Const.DEVICE_PROFILE_LICENCES + token,
-                null,
-                createSuccessListener(),
-                createErrorListener());
-        CustomDashboardApplication.getInstance().addToRequestQueue(myReq);
+        KnoxApiClient.getInstance().getApi()
+                .deviceProfileLicences(token)
+                .enqueue(KnoxApiClient.callback(createSuccessListener(), createErrorListener()));
     }
 
 
@@ -97,8 +93,8 @@ public class LicensesProfileService extends Service {
         return START_STICKY;
     }
 
-    private Response.Listener<String> createSuccessListener() {
-        return new Response.Listener<String>() {
+    private KnoxApiClient.Listener<String> createSuccessListener() {
+        return new KnoxApiClient.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
@@ -139,10 +135,10 @@ public class LicensesProfileService extends Service {
     }
 
 
-    private Response.ErrorListener createErrorListener() {
-        return new Response.ErrorListener() {
+    private KnoxApiClient.ErrorListener createErrorListener() {
+        return new KnoxApiClient.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onError(Throwable error) {
                 errorCode = "Network Error";
                 handler.postDelayed(runnable, 500);
                 releaseService();

@@ -5,11 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Knox.license.Const;
-import com.tabnova.aidashboard.Knox.license.EnhancedStringRequest;
+import com.tabnova.aidashboard.Knox.license.KnoxApiClient;
 import com.tabnova.aidashboard.Knox.license.TokenManager;
 import com.tabnova.aidashboard.Knox.utils.PackageUtils;
 import com.tabnova.aidashboard.Knox.utils.SysUtils;
@@ -71,23 +68,24 @@ public class SystemInfoService extends Service  {
             {device_location}/{device_gateway_ip}/{device_profile_counter}/{token}
          */
 
-        String requestString = Const.DEVICE_DEVICE_DETAILS + SysUtils.getBatteryLevel(mContext) +"/" +
-                PackageUtils.getAppInstallDate(mContext, getApplicationContext().getPackageName()) + "/" +
-                SysUtils.getVersionName(mContext,getApplicationContext().getPackageName()) +"/" +
-                SysUtils.getOSVersion()+"/" +
-                SysUtils.getDeviceModel() + "/" +
-                SysUtils.getMacAddr() + "/" +
-                SysUtils.getLocalIPAddress(mContext) + "/" +
-                SysUtils.getLocation(mContext) + "/" +
-                SysUtils.getLocalIPAddress(mContext) + "/" +
-                SysUtils.getInt(mContext, "profile_counter") + "/" +
-                token;
-        String sysReq  = requestString.replaceAll(" ", "%20");
-        EnhancedStringRequest myReq = new EnhancedStringRequest(sysReq ,
-                null,
-                createSuccessListener(),
-                createErrorListener());
-        CustomDashboardApplication.getInstance().addToRequestQueue(myReq);
+        // Same per-value escaping as before: spaces -> %20 (previously applied to the whole URL).
+        KnoxApiClient.getInstance().getApi().setDeviceDetails(
+                escape(SysUtils.getBatteryLevel(mContext)),
+                escape(PackageUtils.getAppInstallDate(mContext, getApplicationContext().getPackageName())),
+                escape(SysUtils.getVersionName(mContext,getApplicationContext().getPackageName())),
+                escape(SysUtils.getOSVersion()),
+                escape(SysUtils.getDeviceModel()),
+                escape(SysUtils.getMacAddr()),
+                escape(SysUtils.getLocalIPAddress(mContext)),
+                escape(SysUtils.getLocation(mContext)),
+                escape(SysUtils.getLocalIPAddress(mContext)),
+                escape(SysUtils.getInt(mContext, "profile_counter")),
+                escape(token))
+                .enqueue(KnoxApiClient.callback(createSuccessListener(), createErrorListener()));
+    }
+
+    private static String escape(Object value) {
+        return String.valueOf(value).replaceAll(" ", "%20");
     }
 
 
@@ -100,8 +98,8 @@ public class SystemInfoService extends Service  {
         return START_STICKY;
     }
 
-	private Response.Listener<String> createSuccessListener() {
-		return new Response.Listener<String>() {
+	private KnoxApiClient.Listener<String> createSuccessListener() {
+		return new KnoxApiClient.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
                 if(response != null ) {
@@ -114,10 +112,10 @@ public class SystemInfoService extends Service  {
 		};
 	}
 
-	private Response.ErrorListener createErrorListener() {
-		return new Response.ErrorListener() {
+	private KnoxApiClient.ErrorListener createErrorListener() {
+		return new KnoxApiClient.ErrorListener() {
 			@Override
-			public void onErrorResponse(VolleyError error) {
+			public void onError(Throwable error) {
 
                 releaseService();
 			}

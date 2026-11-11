@@ -3,11 +3,8 @@ package com.tabnova.aidashboard.Knox.services;
 import android.app.IntentService;
 import android.content.Intent;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Knox.license.Const;
-import com.tabnova.aidashboard.Knox.license.EnhancedStringRequest;
+import com.tabnova.aidashboard.Knox.license.KnoxApiClient;
 import com.tabnova.aidashboard.Knox.license.TokenManager;
 import com.tabnova.aidashboard.Knox.utils.UsefulUtility;
 
@@ -59,20 +56,19 @@ public class WebLoggingService extends IntentService {
             /setdevicelog/{device_serial_number}/{device_activity}/{activity_result}/{token}'
          */
 
-        String requestString = Const.DEVICE_LOG_TO_CLOUD + UsefulUtility.getSerialNumber() +"/" +
-                currentLog + "/" +
-                currentResult +"/"
-                +token;
-        String sysReq  = requestString.replaceAll(" ", "%20");
-        EnhancedStringRequest myReq = new EnhancedStringRequest(sysReq ,
-                null,
-                createSuccessListener(),
-                createErrorListener());
-        CustomDashboardApplication.getInstance().addToRequestQueue(myReq);
+        // Same per-value escaping as before: spaces -> %20 (previously applied to the whole URL);
+        // "/" -> "-" is still done in onHandleIntent.
+        KnoxApiClient.getInstance().getApi()
+                .setDeviceLog(escape(UsefulUtility.getSerialNumber()), escape(currentLog), escape(currentResult), escape(token))
+                .enqueue(KnoxApiClient.callback(createSuccessListener(), createErrorListener()));
     }
 
-    private Response.Listener<String> createSuccessListener() {
-        return new Response.Listener<String>() {
+    private static String escape(Object value) {
+        return String.valueOf(value).replaceAll(" ", "%20");
+    }
+
+    private KnoxApiClient.Listener<String> createSuccessListener() {
+        return new KnoxApiClient.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 releaseService();
@@ -80,10 +76,10 @@ public class WebLoggingService extends IntentService {
         };
     }
 
-    private Response.ErrorListener createErrorListener() {
-        return new Response.ErrorListener() {
+    private KnoxApiClient.ErrorListener createErrorListener() {
+        return new KnoxApiClient.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onError(Throwable error) {
                 releaseService();
             }
         };

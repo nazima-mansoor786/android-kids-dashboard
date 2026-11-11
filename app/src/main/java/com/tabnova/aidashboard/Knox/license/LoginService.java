@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
-import com.android.volley.DefaultRetryPolicy;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Knox.services.ServiceManager;
 import com.tabnova.aidashboard.Knox.services.SystemInfoService;
@@ -45,18 +42,10 @@ public class LoginService extends Service {
         String userID = UsefulUtility.getSerialNumber();
         String test = Const.AUTHENTICATE + userID + "/" + UsefulUtility.md5(Const.BASIC_PASSWORD);
 
-        GsonRequest<Tocken> myReq = new GsonRequest<>(Const.AUTHENTICATE + userID + "/" + UsefulUtility.md5(Const.BASIC_PASSWORD),
-                Tocken.class, null,
-                createSuccessListener(),
-                createErrorListener());
-
-        int MY_SOCKET_TIMEOUT_MS = 1000 * 20;
-        myReq.setRetryPolicy(new DefaultRetryPolicy(
-                MY_SOCKET_TIMEOUT_MS,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-
-        CustomDashboardApplication.getInstance().addToRequestQueue(myReq);
+        // 20 s timeout (former Volley retry policy) is configured on the login client.
+        KnoxApiClient.getInstance().getLoginApi()
+                .authenticate(String.valueOf(userID), String.valueOf(UsefulUtility.md5(Const.BASIC_PASSWORD)))
+                .enqueue(KnoxApiClient.callback(createSuccessListener(), createErrorListener()));
     }
 
 
@@ -76,7 +65,7 @@ public class LoginService extends Service {
         return START_STICKY;
     }
 
-    private Response.Listener<Tocken> createSuccessListener() {
+    private KnoxApiClient.Listener<Tocken> createSuccessListener() {
         return response -> {
             if (response != null && !response.token.isEmpty()) {
                 tokenManager.setToken(response.token);
@@ -89,10 +78,10 @@ public class LoginService extends Service {
         };
     }
 
-    private Response.ErrorListener createErrorListener() {
-        return new Response.ErrorListener() {
+    private KnoxApiClient.ErrorListener createErrorListener() {
+        return new KnoxApiClient.ErrorListener() {
             @Override
-            public void onErrorResponse(VolleyError error) {
+            public void onError(Throwable error) {
                 //UsefulUtils.showErrorDialog(mContext, "Error ", "Check network connection , \nPlease contact @gmail.com");
                 getCode();
                 releaseService();

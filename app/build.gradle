@@ -115,15 +115,13 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.15.0'
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+    implementation 'com.squareup.retrofit2:converter-scalars:2.11.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.1'
 
     //For Samsung Knox
     compileOnly files('libs/knoxsdk.jar')
     runtimeOnly files('libs/supportlib.jar')
-
-    //VOLLEY
-    implementation 'com.android.volley:volley:1.2.0'
 
     // Replaces lifecycle-extensions; lifecycle-process provides ProcessLifecycleOwner.
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.10.0'

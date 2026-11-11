@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Knox.utils.UsefulUtility;
 
@@ -69,11 +67,9 @@ public class SubscriptionService extends Service {
         String subscription = CustomDashboardApplication.getString(mContext, "subscription_code");
         if (subscription != null && !subscription.isEmpty()) {
             String test = Const.REGISTER + userID + "/" + UsefulUtility.md5(Const.BASIC_PASSWORD) + "/" + subscription + "/" + Const.PROFILE_ID;
-            EnhancedStringRequest myReq = new EnhancedStringRequest(Const.REGISTER + userID + "/" + UsefulUtility.md5(Const.BASIC_PASSWORD) + "/" + subscription + "/" + Const.PROFILE_ID,
-                    null,
-                    createSuccessListener(),
-                    createErrorListener());
-            CustomDashboardApplication.getInstance().addToRequestQueue(myReq);
+            KnoxApiClient.getInstance().getApi()
+                    .register(String.valueOf(userID), String.valueOf(UsefulUtility.md5(Const.BASIC_PASSWORD)), subscription)
+                    .enqueue(KnoxApiClient.callback(createSuccessListener(), createErrorListener()));
         } else {
             Intent intent = new Intent(mContext, SubscriptionDialogActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -92,7 +88,7 @@ public class SubscriptionService extends Service {
         return START_STICKY;
     }
 
-    private Response.Listener<String> createSuccessListener() {
+    private KnoxApiClient.Listener<String> createSuccessListener() {
         return response -> {
             try {
                 if (response.contains("success")) {
@@ -108,7 +104,7 @@ public class SubscriptionService extends Service {
         };
     }
 
-    private Response.ErrorListener createErrorListener() {
+    private KnoxApiClient.ErrorListener createErrorListener() {
         return error -> {
             getCode();
             releaseService();
