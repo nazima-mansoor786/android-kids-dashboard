@@ -446,26 +446,14 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                                 this,
                                 Manifest.permission.ACCESS_COARSE_LOCATION)
                                 != PackageManager.PERMISSION_GRANTED ||
-                        (Utils.isTiramisu() && (ContextCompat.checkSelfPermission(
+                        ContextCompat.checkSelfPermission(
                                 this,
-                                Manifest.permission.READ_MEDIA_IMAGES)
+                                Manifest.permission.GET_ACCOUNTS)
                                 != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(
-                                        this,
-                                        Manifest.permission.READ_MEDIA_VIDEO)
-                                        != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(
-                                        this,
-                                        Manifest.permission.READ_MEDIA_AUDIO)
-                                        != PackageManager.PERMISSION_GRANTED)) ||
-                        (Utils.isMarshMallow() && Utils.isLessTiramisu() && (ContextCompat.checkSelfPermission(
+                        ContextCompat.checkSelfPermission(
                                 this,
-                                Manifest.permission.READ_EXTERNAL_STORAGE)
-                                != PackageManager.PERMISSION_GRANTED ||
-                                ContextCompat.checkSelfPermission(
-                                        this,
-                                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                                        != PackageManager.PERMISSION_GRANTED)))
+                                Manifest.permission.READ_PHONE_STATE)
+                                != PackageManager.PERMISSION_GRANTED)
                     setAllPermission(this);
         }
 
@@ -630,8 +618,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
         runtimePermissions.add("com.android.browser.permission.WRITE_HISTORY_BOOKMARKS");
         runtimePermissions.add("com.google.android.c2dm.permission.RECEIVE");
         runtimePermissions.add("android.permission.sec.MDM_APP_MGMT");
-        runtimePermissions.add("android.permission.WRITE_EXTERNAL_STORAGE");
-        runtimePermissions.add("android.permission.READ_EXTERNAL_STORAGE");
         runtimePermissions.add("com.android.launcher.permission.INSTALL_SHORTCUT");
         runtimePermissions.add("com.android.launcher.permission.UNINSTALL_SHORTCUT");
         runtimePermissions.add("android.permission.WRITE_SETTINGS");
@@ -643,11 +629,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
         runtimePermissions.add("android.permission.READ_PHONE_STATE");
         runtimePermissions.add("android.permission.BLUETOOTH");
         runtimePermissions.add("android.permission.BLUETOOTH_ADMIN");
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            runtimePermissions.add(Manifest.permission.READ_MEDIA_IMAGES);
-            runtimePermissions.add(Manifest.permission.READ_MEDIA_AUDIO);
-            runtimePermissions.add(Manifest.permission.READ_MEDIA_VIDEO);
-        }
 
         EnterpriseDeviceManager edm = EnterpriseDeviceManager.getInstance(context);
         ApplicationPolicy appPolicy = edm.getApplicationPolicy();
