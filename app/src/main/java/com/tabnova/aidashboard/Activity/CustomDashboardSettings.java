@@ -4025,9 +4025,10 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
             if (txCaptureCamera != null) {
                 txCaptureCamera.setOnClickListener(v -> {
-                    boolean result = Utils.checkPermission(context);
                     userChoosenTask = getString(R.string.take_photo);
-                    if (result) {
+                    // CAMERA only. If not yet granted, checkPermission requests it and the camera
+                    // is opened from onRequestPermissionsResult.
+                    if (Utils.checkPermission(context)) {
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
                             cameraIntent();
                         } else {
@@ -4041,10 +4042,9 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
             if (txSelectGallery != null) {
                 txSelectGallery.setOnClickListener(v -> {
-                    boolean result = Utils.checkPermission(context);
                     userChoosenTask = getString(R.string.choose_from_library);
-                    if (result)
-                        galleryIntent();
+                    // ACTION_PICK returns a content URI with a read grant: no permission needed.
+                    galleryIntent();
 
                     alertSelectImage.dismiss();
                 });
@@ -4554,15 +4554,14 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == Utils.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
-                if (userChoosenTask.equals(getString(R.string.take_photo))) {
+            // Only CAMERA is requested with this code (Take photo).
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (getString(R.string.take_photo).equals(userChoosenTask)) {
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
                         cameraIntent();
                     } else {
                         Utils.openCameraIntent(this, CustomDashboardSettings.this);
                     }
-                } else if (userChoosenTask.equals(getString(R.string.choose_from_library))) {
-                    galleryIntent();
                 }
             } else {
                 //code for deny
@@ -4790,16 +4789,8 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                 Intent intent = new Intent(context, AppSelection.class);
                 startActivityForResult(intent, Consts.APP_SELECTION);
             } else if (pos == 1) {
-                if (Utils.isTiramisu() && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    selectImage();
-                } else if (Utils.isMarshMallow() && Utils.isLessTiramisu() &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    selectImage();
-                } else {
-                    requestpermission();
-                }
+                // Wallpaper: no permission needed to open the chooser. Take photo asks for CAMERA itself.
+                selectImage();
             } else if (pos == 2) {
                 //showPasswordSettingDialog();
                 if (Consts.IS_BUSINESS_APP == 1) {

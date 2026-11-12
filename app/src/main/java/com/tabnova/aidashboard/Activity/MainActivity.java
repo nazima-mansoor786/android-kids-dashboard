@@ -1981,11 +1981,11 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                boolean result = Utils.checkPermission(context);
-
                 if (items[item].equals(getString(R.string.take_photo))) {
                     userChoosenTask = getString(R.string.take_photo);
-                    if (result) {
+                    // CAMERA only. If not yet granted, checkPermission requests it and the camera
+                    // is opened from onRequestPermissionsResult.
+                    if (Utils.checkPermission(context)) {
                         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
                             cameraIntent();
                         } else {
@@ -1994,8 +1994,8 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                     }
                 } else if (items[item].equals(getString(R.string.choose_from_library))) {
                     userChoosenTask = getString(R.string.choose_from_library);
-                    if (result)
-                        galleryIntent();
+                    // ACTION_PICK returns a content URI with a read grant: no permission needed.
+                    galleryIntent();
                 } else if (items[item].equals(getString(R.string.cancel))) {
                     dialog.dismiss();
                 }
@@ -4699,15 +4699,14 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             //  isHomeBtnClicked = 0;
             // }
         } else if (requestCode == Utils.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
+            // Only CAMERA is requested with this code (Take photo).
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (userChoosenTask.equals(getString(R.string.take_photo))) {
+                if (getString(R.string.take_photo).equals(userChoosenTask)) {
                     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N) {
                         cameraIntent();
                     } else {
                         Utils.openCameraIntent(this, MainActivity.this);
                     }
-                } else if (userChoosenTask.equals(getString(R.string.choose_from_library))) {
-                    galleryIntent();
                 }
                 //importFile();
             } else {
