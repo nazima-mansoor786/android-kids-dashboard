@@ -3415,6 +3415,12 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
             return true;
         }*/
 
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // Android 6-12: Back arrives as a key event. Let the framework track it so it reaches
+            // the OnBackPressedCallback registered in onCreate (finish when not dashboard-launched).
+            return super.onKeyDown(keyCode, event);
+        }
+
         return true;
     }
 
