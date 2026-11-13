@@ -4831,6 +4831,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                                         CustomDashboardApplication.setInt(context, Consts.is_logged_in, 0);
                                         CustomDashboardApplication.setString(context, Consts.PWD_ENCRY, "0000");
                                         CustomDashboardApplication.setInt(context, Consts.IS_PWD, 0);
+                                        Utils.clearLoginSession(context);
 
                                         if (isProfileDeteted) {
                                             Utils.exitApp(MainActivity.this);
@@ -4876,6 +4877,8 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                         //dialogLoader.hideProgressDialog();
                     }
                 });
+            } else {
+                ShowMessage.showError(context, context.getResources().getString(R.string.no_network));
             }
         } catch (Exception e) {
             e.printStackTrace();

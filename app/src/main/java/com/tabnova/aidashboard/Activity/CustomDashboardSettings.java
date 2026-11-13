@@ -127,6 +127,7 @@ import com.tabnova.aidashboard.Extra.RetrofitExtra;
 import com.tabnova.aidashboard.Extra.RetrofitService;
 import com.tabnova.aidashboard.Extra.SerializeObject;
 import com.tabnova.aidashboard.Extra.SessionManager;
+import com.tabnova.aidashboard.Extra.ShowMessage;
 import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.Knox.startup.SuperLockState;
 import com.tabnova.aidashboard.Knox.utils.SysUtils;
@@ -5501,6 +5502,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                                 CustomDashboardApplication.setInt(context, Consts.is_logged_in, 0);
                                 CustomDashboardApplication.setString(context, Consts.PWD_ENCRY, "0000");
                                 CustomDashboardApplication.setInt(context, Consts.IS_PWD, 0);
+                                Utils.clearLoginSession(context);
                                 btnLogin.setText(getResources().getString(R.string.login));
                                 txLoginStr.setVisibility(View.GONE);
                                 Toast.makeText(context, "User logout successfully.", Toast.LENGTH_SHORT).show();
@@ -5553,6 +5555,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                 });
             } else {
                 //ShowMessage.showError(context, context.getResources().getString(R.string.no_network));
+                ShowMessage.showError(context, context.getResources().getString(R.string.no_network));
             }
         } catch (Exception e) {
             e.printStackTrace();

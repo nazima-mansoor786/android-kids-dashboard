@@ -467,6 +467,20 @@ public class Utils {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
     }
 
+    /**
+     * After a successful backend logout: removes the account session (tokens, profile data,
+     * counters). Keeps the subscription, device serial, Firebase token and first-install flags.
+     */
+    public static void clearLoginSession(Context context) {
+        android.content.SharedPreferences.Editor editor =
+                android.preference.PreferenceManager.getDefaultSharedPreferences(context).edit();
+        for (String key : new String[]{Consts.token, Consts.api_auth_token, Consts.profile_data,
+                Consts.data, Consts.profile_counter, Consts.device_counter, Consts.profile_id}) {
+            editor.remove(key);
+        }
+        editor.apply();
+    }
+
     public static boolean isTiramisu() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
     }
