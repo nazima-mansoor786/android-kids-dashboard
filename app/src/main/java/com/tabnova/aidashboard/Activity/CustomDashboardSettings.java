@@ -4368,13 +4368,11 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     @Override
     protected void onStart() {
         super.onStart();
-        setRequestedOrientation(getResources().getConfiguration().orientation);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        setRequestedOrientation(getResources().getConfiguration().orientation);
     }
 
     // OPEN CAMERA INTENT

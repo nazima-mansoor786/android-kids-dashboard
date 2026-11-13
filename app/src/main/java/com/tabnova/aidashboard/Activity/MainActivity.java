@@ -1945,13 +1945,11 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     @Override
     protected void onStart() {
         super.onStart();
-        setRequestedOrientation(getResources().getConfiguration().orientation);
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        setRequestedOrientation(getResources().getConfiguration().orientation);
     }
 
 
