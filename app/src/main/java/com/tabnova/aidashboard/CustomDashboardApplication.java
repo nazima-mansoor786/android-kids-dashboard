@@ -71,7 +71,6 @@ import com.tabnova.aidashboard.Activity.MainActivity;
 import com.tabnova.aidashboard.BlockApps.WatchingAccessibilityService;
 import com.tabnova.aidashboard.DailyUpdateDataWorker.UpdateDataWorker;
 import com.tabnova.aidashboard.Extra.Consts;
-import com.tabnova.aidashboard.Extra.CurrentAppWorker;
 import com.tabnova.aidashboard.Extra.SerializeObject;
 import com.tabnova.aidashboard.Extra.SessionManager;
 import com.tabnova.aidashboard.Extra.Utils;
@@ -253,20 +252,9 @@ public class CustomDashboardApplication extends Application implements Lifecycle
     public void onAppBackgrounded() {
         //App in background
 
-        Constraints myConstraints = new Constraints.Builder()
-                .setRequiresBatteryNotLow(true)
-                .build();
-
-
-        PeriodicWorkRequest workRequestEnd =
-                new PeriodicWorkRequest.Builder(CurrentAppWorker.class,
-                        10, TimeUnit.SECONDS,
-                        calculateFlexPeriodic(10), TimeUnit.MILLISECONDS)
-                        .setConstraints(myConstraints)
-                        .build();
-
-
-        WorkManager.getInstance(getApplicationContext()).enqueueUniquePeriodicWork("TASK", ExistingPeriodicWorkPolicy.KEEP, workRequestEnd);
+        // CurrentAppWorker (getRunningTasks, result only logged) was removed. Cancel the periodic
+        // work that older versions scheduled under this name.
+        WorkManager.getInstance(getApplicationContext()).cancelUniqueWork("TASK");
     }
 
     public static boolean isNotificationServiceRunning(Context context) {
