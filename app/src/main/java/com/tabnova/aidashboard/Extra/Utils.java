@@ -3,6 +3,8 @@ package com.tabnova.aidashboard.Extra;
 import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
+import android.app.ActivityOptions;
+import android.app.PendingIntent;
 import android.app.admin.DevicePolicyManager;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -14,6 +16,7 @@ import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -40,6 +43,7 @@ import com.tabnova.aidashboard.Activity.FakeActivity;
 import com.tabnova.aidashboard.Activity.FirstActivity;
 import com.tabnova.aidashboard.Activity.MainActivity;
 import com.tabnova.aidashboard.CustomDashboardApplication;
+import com.tabnova.aidashboard.Knox.startup.BeginActivity;
 import com.tabnova.aidashboard.Knox.startup.SuperLockState;
 import com.tabnova.aidashboard.R;
 import com.tabnova.aidashboard.BlockApps.WatchingAccessibilityService;
@@ -521,6 +525,36 @@ public class Utils {
 
     public static boolean isTiramisu() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
+    }
+
+    /**
+     * PendingIntent that relaunches BeginActivity after the app restarts itself (AlarmManager).
+     * Same request code, intent and flags as before.
+     * <p>
+     * Target SDK 35+: a PendingIntent's creator no longer lends its background-activity-start
+     * privileges by default, so opt in explicitly. MODE_BACKGROUND_ACTIVITY_START_ALLOWED is
+     * deprecated on API 36 in favour of ALLOW_IF_VISIBLE / ALLOW_ALWAYS; the app process has
+     * exited when the alarm fires (no visible window), so ALLOW_ALWAYS is used on API 36+.
+     * Below API 34 no options are passed (unchanged behaviour).
+     */
+    @SuppressWarnings("deprecation")
+    public static PendingIntent restartPendingIntent() {
+        Context baseContext = CustomDashboardApplication.getInstance().getBaseContext();
+        Bundle options = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.BAKLAVA) {
+            ActivityOptions activityOptions = ActivityOptions.makeBasic();
+            activityOptions.setPendingIntentCreatorBackgroundActivityStartMode(
+                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOW_ALWAYS);
+            options = activityOptions.toBundle();
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ActivityOptions activityOptions = ActivityOptions.makeBasic();
+            activityOptions.setPendingIntentCreatorBackgroundActivityStartMode(
+                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED);
+            options = activityOptions.toBundle();
+        }
+        return PendingIntent.getActivity(baseContext,
+                192837, new Intent(baseContext, BeginActivity.class),
+                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE, options);
     }
 
     public static boolean isLessTiramisu() {

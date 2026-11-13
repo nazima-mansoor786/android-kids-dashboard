@@ -1070,9 +1070,7 @@ public class CustomDashboardApplication extends Application implements Lifecycle
     }
 
     public static void restart(Context context) {
-        PendingIntent myActivity = PendingIntent.getActivity(CustomDashboardApplication.getInstance().getBaseContext(),
-                192837, new Intent(CustomDashboardApplication.getInstance().getBaseContext(), BeginActivity.class),
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent myActivity = Utils.restartPendingIntent();
 
         AlarmManager alarmManager;
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);

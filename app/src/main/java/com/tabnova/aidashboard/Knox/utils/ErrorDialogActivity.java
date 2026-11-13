@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Knox.startup.AdminReceiver;
+import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.Knox.startup.BeginActivity;
 import com.tabnova.aidashboard.R;
 
@@ -72,9 +73,7 @@ public class ErrorDialogActivity extends Activity {
             setRetryCount(0);
 
             ErrorDialogActivity.this.finish();
-            PendingIntent myActivity = PendingIntent.getActivity(CustomDashboardApplication.getInstance().getBaseContext(),
-                    192837, new Intent(CustomDashboardApplication.getInstance().getBaseContext(), BeginActivity.class),
-                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+            PendingIntent myActivity = Utils.restartPendingIntent();
 
             AlarmManager alarmManager;
             alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

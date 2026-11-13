@@ -226,9 +226,7 @@ public class LicenseManagerActivity extends Activity {
             }
         }
 
-        PendingIntent myActivity = PendingIntent.getActivity(CustomDashboardApplication.getInstance().getBaseContext(),
-                192837, new Intent(CustomDashboardApplication.getInstance().getBaseContext(), BeginActivity.class),
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent myActivity = Utils.restartPendingIntent();
 
         AlarmManager alarmManager;
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
