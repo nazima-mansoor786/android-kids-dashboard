@@ -13,6 +13,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 
 import com.google.firebase.BuildConfig;
@@ -69,6 +70,12 @@ public class ForgotPin extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_pin);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finish();
+            }
+        });
 
         context = this;
 
@@ -226,9 +233,11 @@ public class ForgotPin extends BaseActivity {
         }
 
 
-        if (keyCode == KeyEvent.KEYCODE_BACK){
-            finish();
-            return true;
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // Back is handled by the OnBackPressedCallback registered in onCreate. Let the
+            // framework track the key so it reaches the dispatcher (the catch-all below would
+            // otherwise swallow it while enableOnBackInvokedCallback is false).
+            return super.onKeyDown(keyCode, event);
         }
 
         return true;

@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
@@ -100,6 +101,12 @@ public class ApplicationAnalytics extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_application_analytics);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                finish();
+            }
+        });
 
         context = this;
 
@@ -309,8 +316,10 @@ public class ApplicationAnalytics extends BaseActivity {
         }
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            finish();
-            return true;
+            // Back is handled by the OnBackPressedCallback registered in onCreate. Let the
+            // framework track the key so it reaches the dispatcher (the catch-all below would
+            // otherwise swallow it while enableOnBackInvokedCallback is false).
+            return super.onKeyDown(keyCode, event);
         }
 
         return true;

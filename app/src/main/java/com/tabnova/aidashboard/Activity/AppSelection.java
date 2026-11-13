@@ -27,6 +27,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.cardview.widget.CardView;
@@ -141,6 +142,17 @@ public class AppSelection extends BaseActivity implements AppsAdapter.OnItemSele
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_selection);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (llCustomHelp.getVisibility() == View.VISIBLE) {
+                    llCustomHelp.setVisibility(View.GONE);
+                } else {
+                    //CustomDashboardApplication.setInt(context, Consts.isAppClick, 1);
+                    finish();
+                }
+            }
+        });
 
         context = this;
 
@@ -1166,13 +1178,10 @@ public class AppSelection extends BaseActivity implements AppsAdapter.OnItemSele
         }
 
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (llCustomHelp.getVisibility() == View.VISIBLE) {
-                llCustomHelp.setVisibility(View.GONE);
-            } else {
-                //CustomDashboardApplication.setInt(context, Consts.isAppClick, 1);
-                finish();
-            }
-            return true;
+            // Back is handled by the OnBackPressedCallback registered in onCreate. Let the
+            // framework track the key so it reaches the dispatcher (the catch-all below would
+            // otherwise swallow it while enableOnBackInvokedCallback is false).
+            return super.onKeyDown(keyCode, event);
         }
         return true;
     }
