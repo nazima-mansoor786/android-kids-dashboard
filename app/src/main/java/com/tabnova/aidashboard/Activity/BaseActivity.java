@@ -178,51 +178,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
         apiManager = new APIManager(context);
         dbHelper = new DbHelper(this);
 
-        try {
-            if (Utils.isTiramisu() && ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
-                String serialNo = Utils.readFromFile(context);
-
-                if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                        !serialNo.equalsIgnoreCase(CustomDashboardApplication.getString(context, Consts.generated_serial_no))) {
-                    CustomDashboardApplication.setString(context, Consts.generated_serial_no, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                }
-
-                if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                        !CustomDashboardApplication.getString(context, Consts.generated_serial_no).equalsIgnoreCase("null")) {
-                    Utils.writeToFile(context, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                } else {
-                    Utils.writeToFile(context, CustomDashboardApplication.getSerialNumber());
-                }
-            } else if (Utils.isMarshMallow() && Utils.isLessTiramisu()) {
-                if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-
-                    String serialNo = Utils.readFromFile(context);
-
-                    if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                            !serialNo.equalsIgnoreCase(CustomDashboardApplication.getString(context, Consts.generated_serial_no))) {
-                        CustomDashboardApplication.setString(context, Consts.generated_serial_no, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                    }
-
-                    if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                            !CustomDashboardApplication.getString(context, Consts.generated_serial_no).equalsIgnoreCase("null")) {
-                        Utils.writeToFile(context, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                    } else {
-                        Utils.writeToFile(context, CustomDashboardApplication.getSerialNumber());
-                    }
-                }
-            } else {
-                if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                        !CustomDashboardApplication.getString(context, Consts.generated_serial_no).equalsIgnoreCase("null")) {
-                    Utils.writeToFile(context, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                } else {
-                    Utils.writeToFile(context, CustomDashboardApplication.getSerialNumber());
-                }
-            }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        }
-
         stopAppVisibilityService();
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

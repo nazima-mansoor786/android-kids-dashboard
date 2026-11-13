@@ -517,32 +517,6 @@ public class Login extends BaseActivity {
                 Retrofit retrofit = RetrofitExtra.getInstance();
                 RetrofitService feedApi = retrofit.create(RetrofitService.class);
 
-                if (Utils.isMarshMallow()) {
-                    if (Utils.isTiramisu() && ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
-                        if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                                !CustomDashboardApplication.getString(context, Consts.generated_serial_no).equalsIgnoreCase("null")) {
-                            Utils.writeToFile(context, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                        } else {
-                            Utils.writeToFile(context, CustomDashboardApplication.getSerialNumber());
-                        }
-                    } else if (Utils.isLessTiramisu() && ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                            ActivityCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                        if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                                !CustomDashboardApplication.getString(context, Consts.generated_serial_no).equalsIgnoreCase("null")) {
-                            Utils.writeToFile(context, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                        } else {
-                            Utils.writeToFile(context, CustomDashboardApplication.getSerialNumber());
-                        }
-                    }
-                } else {
-                    if (!TextUtils.isEmpty(CustomDashboardApplication.getString(context, Consts.generated_serial_no)) &&
-                            !CustomDashboardApplication.getString(context, Consts.generated_serial_no).equalsIgnoreCase("null")) {
-                        Utils.writeToFile(context, CustomDashboardApplication.getString(context, Consts.generated_serial_no));
-                    } else {
-                        Utils.writeToFile(context, CustomDashboardApplication.getSerialNumber());
-                    }
-                }
-
                 // REQUEST OBJECT
                 JsonObject jsonObject = new JsonObject();
                 if (!CustomDashboardApplication.getString(context, Consts.generated_serial_no).equals("")

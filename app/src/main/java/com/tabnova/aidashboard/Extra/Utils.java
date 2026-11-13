@@ -337,7 +337,7 @@ public class Utils {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         myBitmap.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
         try {
-            File f = new File(new File(Environment.getExternalStorageDirectory(), "aero"), "profile/" + Calendar.getInstance()
+            File f = new File(new File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "aero"), "profile/" + Calendar.getInstance()
                     .getTimeInMillis() + ".jpg");
             //   File f = new File(wallpaperDirectory, );
             f.createNewFile();
@@ -397,68 +397,6 @@ public class Utils {
         CustomDashboardApplication.setString(context, Consts.generated_serial_no, stringBuilder.toString());
         Log.e("serialNumberRandom", stringBuilder.toString());
         return stringBuilder.toString();
-    }
-
-    public static void writeToFile(Context context, String data) {
-        if (context == null)
-            return;
-        try {
-            String dir = context.getExternalFilesDir(null).toString().split("/Android")[0] + "/Dashboard";
-            File path = new File(dir);
-            if (!path.exists()) {
-                path.mkdir();
-            }
-            File file = new File(path, "serial_number.txt");
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            FileOutputStream stream = new FileOutputStream(file);
-            try {
-                stream.write(data.getBytes());
-            } finally {
-                stream.close();
-            }
-        } catch (Exception e) {
-            Log.e("Exception", "File write failed: ");
-            e.printStackTrace();
-        }
-    }
-
-    public static String readFromFile(Context context) {
-        String ret = "";
-        if (context == null)
-            return ret;
-        try {
-            String dir = context.getExternalFilesDir(null).toString().split("/Android")[0] + "/Dashboard";
-            File path = new File(dir);
-            File file = new File(path, "serial_number.txt");
-            if (file.exists()) {
-                int length = (int) file.length();
-
-                byte[] bytes = new byte[length];
-
-                FileInputStream in = new FileInputStream(file);
-                try {
-                    in.read(bytes);
-                } finally {
-                    in.close();
-                }
-
-                ret = new String(bytes);
-                if (!TextUtils.isEmpty(ret) && !ret.equalsIgnoreCase("null")) {
-                    CustomDashboardApplication.setString(context, Consts.generated_serial_no, ret);
-                }
-            }
-        } catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: ");
-            e.printStackTrace();
-        } catch (Exception e) {
-            Log.e("login activity", "Can not read file: ");
-            e.printStackTrace();
-        }
-
-        return ret;
     }
 
     public static void writeToDomainsFile(Context context, ArrayList<String> data) {

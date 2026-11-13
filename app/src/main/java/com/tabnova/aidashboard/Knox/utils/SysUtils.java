@@ -276,7 +276,7 @@ public class SysUtils {
 
     public static void deleteFolder(String folder) {
         try {
-            File dir = new File(Environment.getExternalStorageDirectory()+folder);
+            File dir = new File(com.tabnova.aidashboard.CustomDashboardApplication.getInstance().getExternalFilesDir(null) + folder);
             rmdir(dir);
 //            if (dir.isDirectory())
 //            {

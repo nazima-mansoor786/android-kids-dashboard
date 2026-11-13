@@ -18,7 +18,8 @@ public class Logger {
      * log TAG
      */
     private static String TAG = "samsung_dashboard";
-    private static final String ROOT = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separatorChar;
+    // App-specific external files dir (the shared storage root is not writable on Android 10+).
+    private static final String ROOT = appFilesRoot();
     private static String FILE_NAME = "samsung_dashboard.txt";
     private static String logFile = ROOT + FILE_NAME;
 
@@ -28,6 +29,12 @@ public class Logger {
     private static boolean debug = true;
     private static boolean write2Sdcard = true;
     private static Logger instance = new Logger();
+
+    private static String appFilesRoot() {
+        android.content.Context app = com.tabnova.aidashboard.CustomDashboardApplication.getInstance();
+        File dir = app != null ? app.getExternalFilesDir(null) : null;
+        return (dir != null ? dir.getAbsolutePath() : "") + File.separatorChar;
+    }
 
     private Logger() {
 

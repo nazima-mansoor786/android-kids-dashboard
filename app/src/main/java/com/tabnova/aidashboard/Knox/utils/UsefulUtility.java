@@ -38,7 +38,7 @@ public class UsefulUtility {
     private static final String JSON_NULL_STR = "null";
 
     public static void cleanDirectory(String path) {
-        File dir = new File(Environment.getExternalStorageDirectory() + path);
+        File dir = new File(com.tabnova.aidashboard.CustomDashboardApplication.getInstance().getExternalFilesDir(null) + path);
         if (dir.isDirectory()) {
             String[] children = dir.list();
             for (int i = 0; i < children.length; i++) {
@@ -213,7 +213,7 @@ public class UsefulUtility {
     public static void downloadFilesFromCloud(String fileurl, String outputFile, Context context) {
 
         File direct;
-        direct = new File(Environment.getExternalStorageDirectory()
+        direct = new File(context.getExternalFilesDir(null)
                 + "/" + outputFile);
 
         if (!direct.exists()) {
@@ -232,7 +232,7 @@ public class UsefulUtility {
         )
                 .setAllowedOverRoaming(false).setTitle("Application Install")
                 .setDescription("Files download install")
-                .setDestinationInExternalPublicDir("/" + outputFile, fileurl.substring(fileurl.lastIndexOf("/") + 1));
+                .setDestinationInExternalFilesDir(context, outputFile, fileurl.substring(fileurl.lastIndexOf("/") + 1));
 
         mgr.enqueue(request);
 
@@ -271,7 +271,7 @@ public class UsefulUtility {
 
         InputStream in = null;
         OutputStream out = null;
-        String sdcardpath = Environment.getExternalStorageDirectory().getPath() + "/" + path + "/" + asset;
+        String sdcardpath = context.getExternalFilesDir(null).getPath() + "/" + path + "/" + asset;
         boolean res = false;
 
         try {

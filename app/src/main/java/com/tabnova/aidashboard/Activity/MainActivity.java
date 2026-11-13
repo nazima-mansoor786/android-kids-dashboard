@@ -2025,8 +2025,9 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
-            String paths = Environment.getExternalStorageDirectory() + String.valueOf(System.currentTimeMillis()) + ".jpg";
-            File destination = new File(Environment.getExternalStorageDirectory(), System.currentTimeMillis() + ".jpg");
+            // App-specific Pictures dir (no storage permission needed; shared root is not writable on Android 10+).
+            String paths = getExternalFilesDir(Environment.DIRECTORY_PICTURES) + String.valueOf(System.currentTimeMillis()) + ".jpg";
+            File destination = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), System.currentTimeMillis() + ".jpg");
 
             FileOutputStream fo = null;
             try {

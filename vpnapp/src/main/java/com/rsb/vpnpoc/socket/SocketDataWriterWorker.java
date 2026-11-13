@@ -189,15 +189,11 @@ public class SocketDataWriterWorker implements Runnable {
         }
 
         ArrayList<String> num_words = MySingletonClass.getInstance().getValue();
-        appendLog("VPNPOC number of blocked host " + num_words.size());
-        appendLog((java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime()) + "VPNPOC URL access by device " + url.replaceAll("[^a-zA-Z0-9]", " ")));
         for (int i = 0; i < num_words.size(); i++) {
             //	System.out.println(TAG+"host checked-----> " + num_words.get(i));
             Log.d(TAG, "VPNPOC checking blocked host " + num_words.get(i));
-            appendLog("VPNPOC checking blocked host " + num_words.get(i));
             if (url.toLowerCase().contains(num_words.get(i).toLowerCase())) {
                 Log.e(TAG, "VPNPOC detected blocked host " + name);
-                appendLog("VPNPOC detected blocked host " + name);
                 return;
             }
         }
@@ -231,30 +227,4 @@ public class SocketDataWriterWorker implements Runnable {
         }
     }
 
-    public void appendLog(String text) {
-
-        if (build.equals("debug")) {
-
-            //File logFile = new File("Android/log.file");
-            File logFile = new File(Environment.getExternalStorageDirectory(), "Android/VPNPOC_log.txt");
-            if (!logFile.exists()) {
-                try {
-                    logFile.createNewFile();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-            try {
-                //BufferedWriter for performance, true to set append to file flag
-                BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-                buf.append(text);
-                buf.newLine();
-                buf.close();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
 }
