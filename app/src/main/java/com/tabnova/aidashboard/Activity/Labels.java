@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
 
+import androidx.activity.OnBackPressedCallback;
+
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Extra.APIManager;
 import com.tabnova.aidashboard.Extra.Consts;
@@ -42,6 +44,13 @@ public class Labels extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_labels);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Back closes Labels (previously super.onBackPressed() did nothing).
+                finish();
+            }
+        });
 
         context = this;
 
@@ -132,10 +141,5 @@ public class Labels extends BaseActivity {
         if (CustomDashboardApplication.getInt(context, Consts.is_logged_in) == 1) {
             apiManager.getProfileCounter(CustomDashboardApplication.getString(context, Consts.token));
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
     }
 }

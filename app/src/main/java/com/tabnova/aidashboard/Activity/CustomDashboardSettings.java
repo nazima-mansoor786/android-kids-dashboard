@@ -75,6 +75,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.PickVisualMediaRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -410,6 +411,16 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_dashboard_settings);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Back closes Settings only when the kiosk dashboard is not launched;
+                // otherwise it stays blocked (same condition as before).
+                if (!sessionManager.getIsDashboardLaunch()) {
+                    finish();
+                }
+            }
+        });
 
         Log.e("CustomDashboard", "onCreate: CustomDashboardSettings");
 
@@ -3405,13 +3416,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
         }*/
 
         return true;
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (!sessionManager.getIsDashboardLaunch()) {
-            super.onBackPressed();
-        }
     }
 
     // SHOW SETTING DIALOG

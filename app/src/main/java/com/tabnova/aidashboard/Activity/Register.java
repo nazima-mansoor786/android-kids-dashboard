@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialog;
 import androidx.cardview.widget.CardView;
@@ -123,6 +124,18 @@ public class Register extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Back closes Register (previously super.onBackPressed() did nothing).
+                finish();
+                if (isRegistered == 0) {
+                    isHomeApp = 1;
+                    Intent intent = new Intent(context, Login.class);
+                    startActivity(intent);
+                }
+            }
+        });
 
         context = this;
 
@@ -864,15 +877,6 @@ public class Register extends BaseActivity {
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        if (isRegistered == 0) {
-            isHomeApp = 1;
-            Intent intent = new Intent(context, Login.class);
-            startActivity(intent);
-        }
-    }
 
     // LOGIN WITH GOOGLE API
     private void loginWithGoogle(String email, String profileName) {

@@ -28,6 +28,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -119,6 +120,27 @@ public class SecureWebView extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_secure_web_view);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webView.copyBackForwardList().getCurrentIndex() > 0) {
+                    edPath.setText(webView.getUrl());
+                    webView.goBack();
+                } else {
+                    // Your exit alert code, or alternatively line below to finish
+                    String ser = SerializeObject.objectToString(webHistoryModels);
+                    if (ser != null && !ser.equalsIgnoreCase("")) {
+                        SerializeObject.WriteSettings(context, ser, Consts.webHistoryFile);
+                    }
+
+
+                    if (CustomDashboardApplication.getInt(context, Consts.is_logged_in) == 1) {
+                        apiManager.uploadWebHistoryToServer();
+                    }
+                    finish();
+                }
+            }
+        });
 
         context = this;
 
@@ -514,26 +536,6 @@ public class SecureWebView extends BaseActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (webView.copyBackForwardList().getCurrentIndex() > 0) {
-            edPath.setText(webView.getUrl());
-            webView.goBack();
-        } else {
-            // Your exit alert code, or alternatively line below to finish
-            String ser = SerializeObject.objectToString(webHistoryModels);
-            if (ser != null && !ser.equalsIgnoreCase("")) {
-                SerializeObject.WriteSettings(context, ser, Consts.webHistoryFile);
-            }
-
-
-            if (CustomDashboardApplication.getInt(context, Consts.is_logged_in) == 1) {
-                apiManager.uploadWebHistoryToServer();
-            }
-            super.onBackPressed(); // finishes activity
         }
     }
 

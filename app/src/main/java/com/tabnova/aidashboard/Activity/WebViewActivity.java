@@ -1,5 +1,6 @@
 package com.tabnova.aidashboard.Activity;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
@@ -28,6 +29,15 @@ public class WebViewActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (webView.canGoBack()) {
+                    webView.goBack();
+                } else
+                    finish();
+            }
+        });
 
         webView = findViewById(R.id.webView);
         ivClose = findViewById(R.id.iv_close);
@@ -71,13 +81,5 @@ public class WebViewActivity extends BaseActivity {
         });
         webView.setWebChromeClient(new WebChromeClient());
         webView.loadUrl(url);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack();
-        } else
-            super.onBackPressed();
     }
 }
