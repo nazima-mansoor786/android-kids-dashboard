@@ -31,8 +31,10 @@ import android.widget.TextView;
 import androidx.activity.OnBackPressedCallback;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.google.gson.JsonObject;
+import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.Adapter.HistoryListAdapter;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Extra.APIManager;
@@ -246,7 +248,7 @@ public class SecureWebView extends BaseActivity {
                     // Create the File where the photo should go
                     File photoFile = null;
                     try {
-                        photoFile = createImageFile();
+                        photoFile = Utils.createImageFile(context);
                         takePictureIntent.putExtra("PhotoPath", mCameraPhotoPath);
                     } catch (IOException ex) {
                         // Error occurred while creating the File
@@ -256,11 +258,13 @@ public class SecureWebView extends BaseActivity {
 
                     // Continue only if the File was successfully created
                     if (photoFile != null) {
-                        mCameraPhotoPath = "file:" + photoFile.getAbsolutePath();
-                        takePictureIntent.putExtra(
-                                MediaStore.EXTRA_OUTPUT,
-                                Uri.fromFile(photoFile)
-                        );
+                        // App-specific Pictures/ shared through the FileProvider (file:// URIs crash on API 24+).
+                        Uri photoUri = FileProvider.getUriForFile(context,
+                                context.getPackageName() + ".provider", photoFile);
+                        mCameraPhotoPath = photoUri.toString();
+                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+                        takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                                | Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     } else {
                         takePictureIntent = null;
                     }
@@ -547,20 +551,6 @@ public class SecureWebView extends BaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES
-        );
-        return File.createTempFile(
-                imageFileName, /* prefix */
-                ".jpg", /* suffix */
-                storageDir      /* directory */
-        );
     }
 
     void askForPermission(
