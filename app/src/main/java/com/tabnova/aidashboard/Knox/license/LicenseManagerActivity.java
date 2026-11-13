@@ -18,6 +18,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
+
 import com.samsung.android.knox.AppIdentity;
 import com.samsung.android.knox.EnterpriseDeviceManager;
 import com.samsung.android.knox.application.ApplicationPolicy;
@@ -95,11 +97,8 @@ public class LicenseManagerActivity extends Activity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(KnoxEnterpriseLicenseManager.ACTION_LICENSE_STATUS);
         filter.addAction(EnterpriseLicenseManager.ACTION_LICENSE_STATUS);
-        if (Utils.isTiramisu()) {
-            registerReceiver(mReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
-        } else {
-            registerReceiver(mReceiver, filter);
-        }
+        // Knox license status is broadcast by the Knox agent (another app): exported, as in LicenseActivity.
+        ContextCompat.registerReceiver(this, mReceiver, filter, ContextCompat.RECEIVER_EXPORTED);
         isRegistered = true;
     }
 

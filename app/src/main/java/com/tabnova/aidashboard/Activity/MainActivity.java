@@ -611,18 +611,13 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             }
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            registerReceiver(
-                    CommonUtility.fileDownloadReceiver,
-                    new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
-                    RECEIVER_NOT_EXPORTED
-            );
-        } else {
-            registerReceiver(
-                    CommonUtility.fileDownloadReceiver,
-                    new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-            );
-        }
+        // DownloadManager sends ACTION_DOWNLOAD_COMPLETE from the system Downloads provider (another
+        // app), so the receiver must be exported to receive it on Android 14+.
+        ContextCompat.registerReceiver(this,
+                CommonUtility.fileDownloadReceiver,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE),
+                ContextCompat.RECEIVER_EXPORTED
+        );
 
         //setupBillingClient();
         stopVPN();
