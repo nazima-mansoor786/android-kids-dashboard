@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat;
 
 import com.samsung.android.knox.license.EnterpriseLicenseManager;
 import com.samsung.android.knox.license.KnoxEnterpriseLicenseManager;
+import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.R;
 
 
@@ -37,6 +38,8 @@ public class LicenseActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_license);
+        // Edge-to-edge: light screen (no action bar), dark status and navigation bar icons.
+        Utils.applyEdgeToEdge(this, null, false, false, true, true);
 
         mContext = this;
         ConnectionDetector cd = new ConnectionDetector(mContext);
