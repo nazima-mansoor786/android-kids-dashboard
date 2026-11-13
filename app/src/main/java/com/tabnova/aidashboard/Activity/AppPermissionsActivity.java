@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Process;
 import android.provider.Settings;
@@ -37,6 +38,11 @@ public class AppPermissionsActivity extends AppCompatActivity {
     public static int request = 0;
 
     private boolean isContinue = false;
+
+    // Android 13+ notification permission: asked once, never required for onboarding.
+    private static final int REQUEST_POST_NOTIFICATIONS = 1001;
+    private boolean notificationPermissionAsked = false;
+    private boolean redirected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +129,20 @@ public class AppPermissionsActivity extends AppCompatActivity {
     }
 
     private void redirectSettingScreen() {
+        if (redirected) {
+            return;
+        }
+        // Android 13+: ask once for notifications after the required permissions. Granted or
+        // denied, onboarding continues (from onRequestPermissionsResult / onResume).
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationPermissionAsked
+                && ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED) {
+            notificationPermissionAsked = true;
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.POST_NOTIFICATIONS}, REQUEST_POST_NOTIFICATIONS);
+            return;
+        }
+        redirected = true;
         if (CustomDashboardApplication.isMyLauncherDefault(context)) {
             CustomDashboardApplication.setInt(context, Consts.set_as_home_app_status, 1);
         } else {
@@ -215,6 +235,11 @@ public class AppPermissionsActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_POST_NOTIFICATIONS) {
+            // Not required: continue onboarding whether it was granted or denied.
+            redirectSettingScreen();
+            return;
+        }
         if (requestCode == request && grantResults.length > 0) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 /*if (Utils.isTiramisu() && (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED

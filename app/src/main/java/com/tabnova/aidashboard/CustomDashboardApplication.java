@@ -7,6 +7,9 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.AppOpsManager;
 import android.app.Application;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
@@ -90,6 +93,7 @@ import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -137,6 +141,7 @@ public class CustomDashboardApplication extends Application implements Lifecycle
         super.onCreate();
         mInstance = this;
         com.tabnova.aidashboard.Extra.BillingManager.getInstance().init(this);
+        createNotificationChannels();
         ProcessLifecycleOwner.get().getLifecycle().addObserver(this);
 
         buildGoogleApiClient();
@@ -1067,6 +1072,52 @@ public class CustomDashboardApplication extends Application implements Lifecycle
         context.startActivity(selector);
 
         packageManager.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DEFAULT, PackageManager.DONT_KILL_APP);
+    }
+
+    /**
+     * Creates every notification channel the app posts to, up front (Android 8+), with the same
+     * ids, names and importance the services use, so notifications sent before a service has run
+     * (e.g. FCM, which uses default_notification_channel_id) land in the right channel.
+     * Creating an existing channel is a no-op, so the services' own createNotificationChannel
+     * calls stay harmless.
+     */
+    private void createNotificationChannels() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return;
+        }
+        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        if (manager == null) {
+            return;
+        }
+        // FCM default channel (manifest default_notification_channel_id), as in MyFirebaseMessagingService.
+        NotificationChannel fcmChannel = new NotificationChannel(getString(R.string.default_notification_channel_id),
+                "NOTIFICATION_CHANNEL_NAME", NotificationManager.IMPORTANCE_HIGH);
+        fcmChannel.enableLights(true);
+        fcmChannel.setLightColor(Color.RED);
+        fcmChannel.enableVibration(true);
+        fcmChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+
+        // VPN website filter (vpnapp VPNService).
+        NotificationChannel vpnChannel = new NotificationChannel("com.rsb.vpnpoc",
+                "Channel One", NotificationManager.IMPORTANCE_DEFAULT);
+        vpnChannel.enableLights(true);
+        vpnChannel.setLightColor(Color.RED);
+        vpnChannel.setShowBadge(true);
+        vpnChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+        // Screen share (screenshare MediaProjectionService).
+        NotificationChannel screenShareChannel = new NotificationChannel("com.tabnova.screenshare",
+                "Screen Share Service", NotificationManager.IMPORTANCE_DEFAULT);
+        screenShareChannel.enableLights(true);
+        screenShareChannel.setLightColor(Color.RED);
+        screenShareChannel.setShowBadge(true);
+        screenShareChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+
+        try {
+            manager.createNotificationChannels(Arrays.asList(fcmChannel, vpnChannel, screenShareChannel));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static void restart(Context context) {
