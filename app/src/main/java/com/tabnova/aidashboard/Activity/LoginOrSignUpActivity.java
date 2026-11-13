@@ -12,6 +12,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Extra.Consts;
 import com.tabnova.aidashboard.Extra.SessionManager;
@@ -39,6 +40,8 @@ public class LoginOrSignUpActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_or_sign_up);
+        // Edge-to-edge: purple root, default (white) bar icons.
+        Utils.applyEdgeToEdge(this, null, false, false, false, false);
 
         //INIT CONTEXT
         context = this;

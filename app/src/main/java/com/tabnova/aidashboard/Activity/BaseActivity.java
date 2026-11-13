@@ -32,8 +32,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.WindowCompat;
-import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -161,23 +159,8 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void applyEdgeToEdgeInsets() {
-        ViewGroup content = findViewById(android.R.id.content);
-        if (content != null && content.getChildCount() > 0) {
-            Utils.applySystemBarInsets(content.getChildAt(0), getTopInsetView(),
-                    useCutoutOnlyInsets(), applyImeInsets());
-        }
-        // Icon contrast only matters once edge-to-edge is enforced (API 35+). Below that the
-        // system bars keep their own colors, so the icon appearance is left untouched.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-            WindowInsetsControllerCompat controller =
-                    WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
-            if (useLightStatusBarIcons()) {
-                controller.setAppearanceLightStatusBars(true);
-            }
-            if (useLightNavigationBarIcons()) {
-                controller.setAppearanceLightNavigationBars(true);
-            }
-        }
+        Utils.applyEdgeToEdge(this, getTopInsetView(), useCutoutOnlyInsets(), applyImeInsets(),
+                useLightStatusBarIcons(), useLightNavigationBarIcons());
     }
 
     @Override

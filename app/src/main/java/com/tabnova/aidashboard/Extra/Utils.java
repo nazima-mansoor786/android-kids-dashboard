@@ -37,6 +37,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 import androidx.work.WorkManager;
@@ -600,6 +601,44 @@ public class Utils {
             return insets;
         });
         ViewCompat.requestApplyInsets(root);
+    }
+
+    /**
+     * Edge-to-edge for any Activity, called right after setContentView: system-bar / cutout
+     * insets via {@link #applySystemBarInsets} on every API level, and (API 35+ only, when
+     * edge-to-edge is enforced) dark status / navigation bar icons for light areas.
+     */
+    public static void applyEdgeToEdge(Activity activity, @Nullable View topInsetView, boolean cutoutOnly,
+                                       boolean includeIme, boolean lightStatusIcons, boolean lightNavIcons) {
+        ViewGroup content = activity.findViewById(android.R.id.content);
+        if (content != null && content.getChildCount() > 0) {
+            applySystemBarInsets(content.getChildAt(0), topInsetView, cutoutOnly, includeIme);
+        }
+        // Icon contrast only matters once edge-to-edge is enforced (API 35+). Below that the
+        // system bars keep their own colors, so the icon appearance is left untouched.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            WindowInsetsControllerCompat controller =
+                    WindowCompat.getInsetsController(activity.getWindow(), activity.getWindow().getDecorView());
+            if (lightStatusIcons) {
+                controller.setAppearanceLightStatusBars(true);
+            }
+            if (lightNavIcons) {
+                controller.setAppearanceLightNavigationBars(true);
+            }
+        }
+    }
+
+    /** Child {@code index} of an Activity's layout root (for headers that have no id). */
+    @Nullable
+    public static View layoutRootChild(Activity activity, int index) {
+        ViewGroup content = activity.findViewById(android.R.id.content);
+        if (content != null && content.getChildCount() > 0 && content.getChildAt(0) instanceof ViewGroup) {
+            ViewGroup root = (ViewGroup) content.getChildAt(0);
+            if (index >= 0 && index < root.getChildCount()) {
+                return root.getChildAt(index);
+            }
+        }
+        return null;
     }
 
     /**

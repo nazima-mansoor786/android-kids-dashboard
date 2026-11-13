@@ -66,6 +66,8 @@ public class SubscriptionPlanInfoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subscription_plan_info);
+        // Edge-to-edge: purple header (first child, no id) behind the status bar; light strip at the bottom.
+        Utils.applyEdgeToEdge(this, Utils.layoutRootChild(this, 0), false, false, false, true);
 
         //INIT CONTEXT
         context = this;

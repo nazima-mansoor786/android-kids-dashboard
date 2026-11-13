@@ -110,6 +110,8 @@ public class BlockDomainActivity extends AppCompatActivity implements BlockDomai
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_block_domain);
+        // Edge-to-edge: light screen, dark status and navigation bar icons.
+        Utils.applyEdgeToEdge(this, null, false, false, true, true);
 
         this.context = BlockDomainActivity.this;
 

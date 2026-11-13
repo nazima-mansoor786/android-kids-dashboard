@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 //import com.tabnova.aidashboard.BuildConfig;
+import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.Extra.BillingManager;
 import com.tabnova.aidashboard.Extra.SessionManager;
 import com.tabnova.aidashboard.R;
@@ -40,6 +41,8 @@ public class MyPlansActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_plans);
+        // Edge-to-edge: light screen, dark status and navigation bar icons.
+        Utils.applyEdgeToEdge(this, null, false, false, true, true);
 
         //INIT CONTEXT
         context = this;

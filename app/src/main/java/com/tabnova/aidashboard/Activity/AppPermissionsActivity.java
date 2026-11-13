@@ -42,6 +42,8 @@ public class AppPermissionsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_permissions);
+        // Edge-to-edge: purple root, default (white) bar icons.
+        Utils.applyEdgeToEdge(this, null, false, false, false, false);
 
         //INIT CONTEXT
         context = this;
