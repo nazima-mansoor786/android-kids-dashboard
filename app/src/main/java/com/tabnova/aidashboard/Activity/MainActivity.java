@@ -271,6 +271,12 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
     //SESSION MANAGER
     private SessionManager sessionManager;
 
+    @Override
+    protected boolean useCutoutOnlyInsets() {
+        // Immersive dashboard: status and navigation bars are hidden.
+        return true;
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -139,6 +139,17 @@ public class AppSelection extends BaseActivity implements AppsAdapter.OnItemSele
     Context context;
 
     @Override
+    protected View getTopInsetView() {
+        // Purple Toolbar (child 1; child 0 is the hidden help overlay; no id) extends behind the status bar.
+        return layoutRootChild(1);
+    }
+
+    @Override
+    protected boolean useLightNavigationBarIcons() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_selection);

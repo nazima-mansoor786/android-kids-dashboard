@@ -117,6 +117,16 @@ public class SecureWebView extends BaseActivity {
     PermissionRequest webViewRequest;
 
     @Override
+    protected boolean useLightStatusBarIcons() {
+        return true;
+    }
+
+    @Override
+    protected boolean useLightNavigationBarIcons() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_secure_web_view);

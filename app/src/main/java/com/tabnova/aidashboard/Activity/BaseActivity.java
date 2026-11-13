@@ -21,6 +21,8 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -97,6 +101,84 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationCallback mLocationCallback;
     private DbHelper dbHelper;
+
+    @Override
+    public void setContentView(int layoutResID) {
+        super.setContentView(layoutResID);
+        applyEdgeToEdgeInsets();
+    }
+
+    @Override
+    public void setContentView(View view) {
+        super.setContentView(view);
+        applyEdgeToEdgeInsets();
+    }
+
+    @Override
+    public void setContentView(View view, ViewGroup.LayoutParams params) {
+        super.setContentView(view, params);
+        applyEdgeToEdgeInsets();
+    }
+
+    /** Immersive screens return true: only the display cutout is avoided (bars are hidden). */
+    protected boolean useCutoutOnlyInsets() {
+        return false;
+    }
+
+    /**
+     * Header that should extend behind the status bar (gets the top inset). Called after
+     * setContentView, so subclass views can be looked up. Null = the layout root gets it.
+     */
+    protected View getTopInsetView() {
+        return null;
+    }
+
+    /** Screens with input fields low on the screen return true: bottom padding follows the keyboard. */
+    protected boolean applyImeInsets() {
+        return false;
+    }
+
+    /** True when the area behind the status bar is light: use dark status bar icons. */
+    protected boolean useLightStatusBarIcons() {
+        return false;
+    }
+
+    /** True when the area behind the navigation bar is light: use dark navigation bar icons. */
+    protected boolean useLightNavigationBarIcons() {
+        return false;
+    }
+
+    /** Child {@code index} of the layout root (for headers that have no id). */
+    protected View layoutRootChild(int index) {
+        ViewGroup content = findViewById(android.R.id.content);
+        if (content != null && content.getChildCount() > 0 && content.getChildAt(0) instanceof ViewGroup) {
+            ViewGroup root = (ViewGroup) content.getChildAt(0);
+            if (index >= 0 && index < root.getChildCount()) {
+                return root.getChildAt(index);
+            }
+        }
+        return null;
+    }
+
+    private void applyEdgeToEdgeInsets() {
+        ViewGroup content = findViewById(android.R.id.content);
+        if (content != null && content.getChildCount() > 0) {
+            Utils.applySystemBarInsets(content.getChildAt(0), getTopInsetView(),
+                    useCutoutOnlyInsets(), applyImeInsets());
+        }
+        // Icon contrast only matters once edge-to-edge is enforced (API 35+). Below that the
+        // system bars keep their own colors, so the icon appearance is left untouched.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            WindowInsetsControllerCompat controller =
+                    WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+            if (useLightStatusBarIcons()) {
+                controller.setAppearanceLightStatusBars(true);
+            }
+            if (useLightNavigationBarIcons()) {
+                controller.setAppearanceLightNavigationBars(true);
+            }
+        }
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

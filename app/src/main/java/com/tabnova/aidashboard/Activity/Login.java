@@ -145,6 +145,23 @@ public class Login extends BaseActivity {
     private boolean isGoogleLogin = false;
 
     @Override
+    protected View getTopInsetView() {
+        // Purple header (first child of the layout root; it has no id) extends behind the status bar.
+        return layoutRootChild(0);
+    }
+
+    @Override
+    protected boolean applyImeInsets() {
+        return true;
+    }
+
+    @Override
+    protected boolean useLightNavigationBarIcons() {
+        // The bottom inset strip shows the (light) root background, not the purple content.
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);

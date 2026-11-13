@@ -25,13 +25,17 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -66,6 +70,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.WeakHashMap;
 
 import okhttp3.internal.Util;
 
@@ -525,6 +530,76 @@ public class Utils {
 
     public static boolean isTiramisu() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
+    }
+
+    /** Original padding / fixed height of views passed to applySystemBarInsets (captured once). */
+    private static final WeakHashMap<View, int[]> ORIGINAL_PADDING = new WeakHashMap<>();
+    private static final WeakHashMap<View, Integer> ORIGINAL_HEIGHT = new WeakHashMap<>();
+
+    private static int[] originalPadding(View view) {
+        int[] padding = ORIGINAL_PADDING.get(view);
+        if (padding == null) {
+            padding = new int[]{view.getPaddingLeft(), view.getPaddingTop(),
+                    view.getPaddingRight(), view.getPaddingBottom()};
+            ORIGINAL_PADDING.put(view, padding);
+        }
+        return padding;
+    }
+
+    /**
+     * Edge-to-edge (Android 15+ at target 35, mandatory at target 36): keeps content clear of the
+     * system bars and display cutout. Insets are ADDED to each view's original padding, captured
+     * once, so repeated inset passes never accumulate. Insets are returned unconsumed.
+     *
+     * @param root         layout root; gets the left/right/bottom insets (and the top inset when
+     *                     {@code topInsetView} is null).
+     * @param topInsetView optional header that should extend behind the status bar; gets the top
+     *                     inset as extra top padding. If its height is fixed, the height grows by
+     *                     the same amount so its content is not squeezed.
+     * @param cutoutOnly   immersive screens: only the display cutout is avoided.
+     * @param includeIme   bottom padding = max(system-bar bottom, keyboard height).
+     */
+    public static void applySystemBarInsets(View root, @Nullable View topInsetView,
+                                            boolean cutoutOnly, boolean includeIme) {
+        if (root == null) {
+            return;
+        }
+        final int[] rootPadding = originalPadding(root);
+        final View top = (topInsetView == root) ? null : topInsetView;
+        final int[] topPadding = top != null ? originalPadding(top) : null;
+        if (top != null && !ORIGINAL_HEIGHT.containsKey(top)) {
+            ViewGroup.LayoutParams lp = top.getLayoutParams();
+            ORIGINAL_HEIGHT.put(top, lp != null ? lp.height : ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+        final int types = cutoutOnly
+                ? WindowInsetsCompat.Type.displayCutout()
+                : WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout();
+        ViewCompat.setOnApplyWindowInsetsListener(root, (v, insets) -> {
+            Insets bars = insets.getInsets(types);
+            int bottom = bars.bottom;
+            if (includeIme) {
+                bottom = Math.max(bottom, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom);
+            }
+            if (top != null) {
+                v.setPadding(rootPadding[0] + bars.left, rootPadding[1],
+                        rootPadding[2] + bars.right, rootPadding[3] + bottom);
+                top.setPadding(topPadding[0], topPadding[1] + bars.top, topPadding[2], topPadding[3]);
+                Integer originalHeight = ORIGINAL_HEIGHT.get(top);
+                ViewGroup.LayoutParams lp = top.getLayoutParams();
+                if (originalHeight != null && originalHeight > 0 && lp != null) {
+                    int newHeight = originalHeight + bars.top;
+                    if (lp.height != newHeight) {
+                        lp.height = newHeight;
+                        top.setLayoutParams(lp);
+                    }
+                }
+            } else {
+                v.setPadding(rootPadding[0] + bars.left, rootPadding[1] + bars.top,
+                        rootPadding[2] + bars.right, rootPadding[3] + bottom);
+            }
+            return insets;
+        });
+        ViewCompat.requestApplyInsets(root);
     }
 
     /**

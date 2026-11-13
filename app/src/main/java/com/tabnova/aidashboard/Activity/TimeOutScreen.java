@@ -149,6 +149,16 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
     private CountDownTimer countDownTimer;
 
     @Override
+    protected boolean useLightStatusBarIcons() {
+        return true;
+    }
+
+    @Override
+    protected boolean useLightNavigationBarIcons() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 

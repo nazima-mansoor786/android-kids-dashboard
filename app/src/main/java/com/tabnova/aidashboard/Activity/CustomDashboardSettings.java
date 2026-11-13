@@ -408,6 +408,16 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     private ActivityResultLauncher<PickVisualMediaRequest> pickMediaLauncher;
 
     @Override
+    protected boolean useLightStatusBarIcons() {
+        return true;
+    }
+
+    @Override
+    protected boolean useLightNavigationBarIcons() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_custom_dashboard_settings);

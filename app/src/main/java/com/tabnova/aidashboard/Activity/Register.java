@@ -121,6 +121,11 @@ public class Register extends BaseActivity {
     private List<ProfileListModel> kidsAgeList = new ArrayList<>();
 
     @Override
+    protected boolean applyImeInsets() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);

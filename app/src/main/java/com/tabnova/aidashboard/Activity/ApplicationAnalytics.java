@@ -98,6 +98,17 @@ public class ApplicationAnalytics extends BaseActivity {
     Integer request = 0;
 
     @Override
+    protected View getTopInsetView() {
+        // Purple Toolbar (first child of the layout root; it has no id) extends behind the status bar.
+        return layoutRootChild(0);
+    }
+
+    @Override
+    protected boolean useLightNavigationBarIcons() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_application_analytics);
