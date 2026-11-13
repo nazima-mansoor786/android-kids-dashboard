@@ -29,7 +29,7 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
-import com.google.firebase.BuildConfig;
+import com.tabnova.aidashboard.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -159,7 +159,6 @@ public class APIManager {
                         SysUtils.getInt(context, "profile_counter") + "/" +
                         CustomDashboardApplication.getString(context, Consts.token));
 
-                Log.e("serverReq", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -245,11 +244,9 @@ public class APIManager {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
                 jsonObject.add(Consts.applications, appData);
-                Log.e("reqObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.addWebHistory(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 final ArrayList<WebHistoryModel> finalWebHistoryModels = webHistoryModels;
                 calls.enqueue(new Callback<JsonObject>() {
@@ -260,7 +257,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -291,7 +287,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -361,14 +356,12 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updateAdvanceSettings(reqObj);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                         }
                     }
 
@@ -424,14 +417,12 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updateWipeDetails(reqObj);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                         }
                     }
 
@@ -462,14 +453,12 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.checkPaymentStatus(CustomDashboardApplication.getString(context, Consts.token), String.valueOf(profileId));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
 
                             try {
                                 JSONObject respObj = new JSONObject(responseString);
@@ -522,11 +511,9 @@ public class APIManager {
                 jsonObject.addProperty(Consts.date_time_setting, CustomDashboardApplication.getClockSetting(context, Consts.SELECTED_TIME_SETTING));
                 jsonObject.addProperty(Consts.shortcuts_status, CustomDashboardApplication.getShortCut(context, Consts.SHORTCUT_DASHBOARD));
                 jsonObject.addProperty(Consts.secure_web_browser, CustomDashboardApplication.getInt(context, Consts.SECURE_BROWSER_ENABLE));
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updateProfileSettings(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -839,7 +826,6 @@ public class APIManager {
             }
         }
 
-        Log.e("apps", jsonArray.toString());
 
         JsonArray appData;
         JsonParser jsonParser = new JsonParser();
@@ -848,7 +834,6 @@ public class APIManager {
         JsonObject reqObj = new JsonObject();
         reqObj.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
         reqObj.add(Consts.applications, appData);
-        Log.e("reqObj", reqObj.toString());
 
         try {
             if (NetConnectivity.isOnline(context)) {
@@ -857,19 +842,16 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.uploadDeviceApplication(reqObj);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                         } else {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -920,11 +902,9 @@ public class APIManager {
                 jsonObject.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
                 jsonObject.addProperty(Consts.profile_id, profileId);
 
-                Log.e("reqObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.deleteWallpaper(jsonObject);
-                Log.e("url", calls.request().toString());
 
 
                 calls.enqueue(new Callback<JsonObject>() {
@@ -935,7 +915,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -956,7 +935,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1000,11 +978,9 @@ public class APIManager {
                 String latitude = String.valueOf(lat);
                 String longitude = String.valueOf(lng);
                 jsonObject.addProperty(Consts.latlong, latitude + "," + longitude);
-                Log.e("reqObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.setDeviceLocation(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1014,7 +990,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -1035,7 +1010,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1076,11 +1050,9 @@ public class APIManager {
                 String latitude = String.valueOf(lat);
                 String longitude = String.valueOf(lng);
                 jsonObject.addProperty(Consts.latlong, latitude + "," + longitude);
-                Log.e("reqObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.setDeviceLocation(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1088,7 +1060,6 @@ public class APIManager {
                         //  dialogLoader.hideProgressDialog();
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -1112,7 +1083,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1212,11 +1182,9 @@ public class APIManager {
                         jsonObject.addProperty(Consts.device_serial_number, CustomDashboardApplication.getInstance().getSerialNumber());
                     }
                     jsonObject.add(Consts.applications, appData);
-                    Log.e("reqObj", jsonObject.toString());
 
                     // API CALL
                     Call<JsonObject> calls = feedApi.uploadAppsAnalyticsData(jsonObject);
-                    Log.e("url", calls.request().toString());
 
                     final ArrayList<ApplicationTimerModel> finalUserModels = userModels;
                     calls.enqueue(new Callback<JsonObject>() {
@@ -1228,7 +1196,6 @@ public class APIManager {
 
                             if (response.code() == 200) {
                                 String responseString = response.body().toString();
-                                Log.e("respCounter", response.body().toString());
                                 try {
                                     final JSONObject jsonObject = new JSONObject(responseString);
                                     int status = jsonObject.getInt(Consts.status);
@@ -1272,7 +1239,6 @@ public class APIManager {
                                 try {
                                     String resp = response.errorBody().string();
                                     Log.d("tag", "onResponse - Status : " + response.code());
-                                    Log.e("regErr->", resp);
                                     Gson gson = new Gson();
                                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1324,11 +1290,9 @@ public class APIManager {
                 jsonObject.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
                 jsonObject.addProperty(Consts.profile_id, profileId);
                 jsonObject.addProperty(Consts.pin, password);
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updatePin(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1382,7 +1346,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1439,7 +1402,6 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getProfile(Consts.BaseUrl + Consts.SERVICE_GET_PROFILE_LIST + apiAuthToken, profileId);
-                Log.e("url", calls.request().toString());
 
                 final ArrayList<DailyTimerModel> finalDailyTimerModels = dailyTimerModels;
                 calls.enqueue(new Callback<JsonObject>() {
@@ -1448,7 +1410,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -1738,7 +1699,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1800,7 +1760,6 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getAllApplicationList(CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1808,12 +1767,10 @@ public class APIManager {
 
                         //dialogLoader.hideProgressDialog();
 
-                        Log.e("APIManager", "onResponse: getApplicationList : " + call.request());
 
                         if (response.body() != null) {
                             if (response.code() == 200 || response.code() == 201) {
                                 final String responseString = response.body().toString();
-                                Log.e("APIManager", "getApplicationList : GET All Apps : resp" + response.body().toString());
                                 try {
                                     final JSONObject jsonObject = new JSONObject(responseString);
                                     int status = jsonObject.getInt(Consts.status);
@@ -2238,11 +2195,9 @@ public class APIManager {
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
                     jsonObject.add(Consts.call_history, callLogData);
-                    Log.e("requestObj", jsonObject.toString());
 
                     // API CALL
                     Call<JsonObject> calls = feedApi.savePhoneHistory(jsonObject);
-                    Log.e("url", calls.request().toString());
 
                     calls.enqueue(new Callback<JsonObject>() {
                         @Override
@@ -2252,7 +2207,6 @@ public class APIManager {
 
                             if (response.code() == 200) {
                                 final String responseString = response.body().toString();
-                                Log.e("resp", response.body().toString());
                                 try {
                                     final JSONObject jsonObject = new JSONObject(responseString);
                                     int status = jsonObject.getInt(Consts.status);
@@ -2289,7 +2243,6 @@ public class APIManager {
                                 try {
                                     String resp = response.errorBody().string();
                                     Log.d("tag", "onResponse - Status : " + response.code());
-                                    Log.e("regErr->", resp);
                                     Gson gson = new Gson();
                                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -2506,11 +2459,9 @@ public class APIManager {
                     JsonObject jsonObject = new JsonObject();
                     jsonObject.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
                     jsonObject.add(Consts.call_history, callLogData);
-                    Log.e("requestObj", jsonObject.toString());
 
                     // API CALL
                     Call<JsonObject> calls = feedApi.savePhoneHistory(jsonObject);
-                    Log.e("url", calls.request().toString());
 
                     calls.enqueue(new Callback<JsonObject>() {
                         @Override
@@ -2520,7 +2471,6 @@ public class APIManager {
 
                             if (response.code() == 200) {
                                 final String responseString = response.body().toString();
-                                Log.e("resp", response.body().toString());
                                 try {
                                     final JSONObject jsonObject = new JSONObject(responseString);
                                     int status = jsonObject.getInt(Consts.status);
@@ -2557,7 +2507,6 @@ public class APIManager {
                                 try {
                                     String resp = response.errorBody().string();
                                     Log.d("tag", "onResponse - Status : " + response.code());
-                                    Log.e("regErr->", resp);
                                     Gson gson = new Gson();
                                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -2611,8 +2560,6 @@ public class APIManager {
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                        if (response != null && response.body() != null)
-                            Log.e("img_resp", response.body().toString());
                     }
 
                     @Override
@@ -2670,11 +2617,9 @@ public class APIManager {
                         e.printStackTrace();
                     }
                 }
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updateProfileSchedule(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -2684,7 +2629,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -2710,7 +2654,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -2761,11 +2704,9 @@ public class APIManager {
                 Retrofit retrofit = RetrofitExtra.getInstance();
                 RetrofitService feedApi = retrofit.create(RetrofitService.class);
 
-                Log.e("requestObj", reqObj.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.addScheduleEvent(reqObj);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -2868,14 +2809,12 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getCounter(Consts.BaseUrl + Consts.SERVICE_GET_PROFILE_COUNTER + token);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -2936,7 +2875,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -2986,7 +2924,6 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getScheduleEventList(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -2996,7 +2933,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -3051,7 +2987,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -3131,13 +3066,11 @@ public class APIManager {
 
                 // REQUEST API CALL
                 Call<JsonObject> calls = feedApi.saveWebShortcuts(jsonObject);
-                Log.e("saveWebShortCutUrl", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.code() == 200) {
-                            Log.e("webShortcutResp", response.body().toString());
                         }
                     }
 
@@ -3163,13 +3096,11 @@ public class APIManager {
                 // API CALL
                 Call<JsonObject> calls = feedApi.getWebShortcuts(CustomDashboardApplication.getString(context, Consts.token));
 
-                Log.e("serverReq", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.body() != null) {
-                            Log.e("serverReq", response.body().toString());
                             try {
                                 JSONObject responseObj = new JSONObject(response.body().toString());
 
@@ -3304,7 +3235,6 @@ public class APIManager {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.logoutUser(Consts.BaseUrl + Consts.SERVICE_LOGOUT + CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -3312,7 +3242,6 @@ public class APIManager {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
 
@@ -3356,7 +3285,6 @@ public class APIManager {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 

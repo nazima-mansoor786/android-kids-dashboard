@@ -200,8 +200,6 @@ public enum SessionManager {
 
         try {
             SocketAddress socketAddress = new InetSocketAddress(ips, port);
-            Log.d(TAG, "initialized connection to remote UDP server: " + ips + ":" +
-                    port + " from " + sourceIpAddress + ":" + srcPort);
             channel.connect(socketAddress);
             session.setConnected(channel.isConnected());
         } catch (IOException e) {
@@ -283,7 +281,6 @@ public enum SessionManager {
 
         //initiate connection to reduce latency
         SocketAddress socketAddress = new InetSocketAddress(ips, port);
-        Log.d(TAG, "initiate connecting to remote tcp server: " + ips + ":" + port);
         boolean connected;
         try {
             connected = channel.connect(socketAddress);

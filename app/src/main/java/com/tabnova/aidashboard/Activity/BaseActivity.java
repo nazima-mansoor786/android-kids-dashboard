@@ -206,8 +206,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                             }
                             mPrevLocation = locationResult.getLastLocation();
                             //Toast.makeText(context, "lat : " + location.getLatitude() + " long : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                            Log.e("latitude", locationResult.getLastLocation().getLatitude() + "");
-                            Log.e("longitude", locationResult.getLastLocation().getLongitude() + "");
                         }
                     } else {
                         //Toast.makeText(context, "Device Location API Call lat :" + location.getLatitude() + " long : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
@@ -223,8 +221,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                         }
                         mPrevLocation = locationResult.getLastLocation();
                         //Toast.makeText(context, "lat : " + location.getLatitude() + " long : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                        Log.e("latitude", locationResult.getLastLocation().getLatitude() + "");
-                        Log.e("longitude", locationResult.getLastLocation().getLongitude() + "");
                     }
                 }
             }
@@ -361,16 +357,12 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                         apiManager.setDeviceLocation(location.getLatitude(), location.getLongitude());
                         mPrevLocation = location;
                         //Toast.makeText(context, "lat : " + location.getLatitude() + " long : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                        Log.e("latitude", location.getLatitude() + "");
-                        Log.e("longitude", location.getLongitude() + "");
                     }
                 } else {
                     //Toast.makeText(context, "Device Location API Call lat :" + location.getLatitude() + " long : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
                     apiManager.setDeviceLocation(location.getLatitude(), location.getLongitude());
                     mPrevLocation = location;
                     //Toast.makeText(context, "lat : " + location.getLatitude() + " long : " + location.getLongitude(), Toast.LENGTH_SHORT).show();
-                    Log.e("latitude", location.getLatitude() + "");
-                    Log.e("longitude", location.getLongitude() + "");
                 }
 
              /*   if (mLastLocation != null) {
@@ -394,7 +386,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
         //Logger.i("BaseActivity : Resume");
 
 
-        Log.e(TAG, "onCreate: Serial Number : " + CustomDashboardApplication.getString(context, Consts.generated_serial_no));
 
         try {
             if (CustomDashboardApplication.isDeviceSamsungActivated() && SessionManager.getInstance(this).getIsDashboardLaunch()) {

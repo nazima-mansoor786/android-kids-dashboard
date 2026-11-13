@@ -83,7 +83,7 @@ import androidx.work.WorkManager;
 import androidx.work.WorkRequest;
 
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.BuildConfig;
+import com.tabnova.aidashboard.BuildConfig;
 import com.google.gson.JsonObject;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DecodeFormat;
@@ -316,7 +316,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             CustomDashboardApplication.setString(context, Consts.APP_VERSION, CustomDashboardApplication.getAppVersion(context, getPackageName()));
         }
 
-        Log.e(TAG, "onCreate: Serial Number : " + CustomDashboardApplication.getString(context, Consts.generated_serial_no));
 
         alertDialogLauncher = new AppCompatDialog(context);
 
@@ -2138,7 +2137,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                 }
 
                 JSONObject jsonObject = new JSONObject(text.toString());
-                Log.e("fileData", jsonObject.toString());
 
                 final ArrayList<AppModel> appModels = new ArrayList<>();
 
@@ -4812,7 +4810,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.logoutUser(Consts.BaseUrl + Consts.SERVICE_LOGOUT + CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -4821,7 +4818,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                         if (response.code() == 200 || response.code() == 201) {
                             if (response.body() != null) {
                                 String responseString = response.body().toString();
-                                Log.e("respCounter", response.body().toString());
                                 try {
                                     final JSONObject jsonObject = new JSONObject(responseString);
 

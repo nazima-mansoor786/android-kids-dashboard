@@ -89,7 +89,6 @@ public class Locator implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        Log.d(LOG_TAG, "Location found : " + location.getLatitude() + ", " + location.getLongitude() + (location.hasAccuracy() ? " : +- " + location.getAccuracy() + " meters" : ""));
         this.locationManager.removeUpdates(this);
         this.callback.onLocationFound(location, context);
     }

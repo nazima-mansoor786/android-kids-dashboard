@@ -119,7 +119,6 @@ public class StartStopScreenShare {
                         peerIceServers.add(peerIceServer);
                     }
                 }
-                Log.d("onApiResponse", "IceServers\n" + iceServers.toString());
             }
 
             @Override

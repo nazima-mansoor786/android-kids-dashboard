@@ -1252,7 +1252,6 @@ public class AppSelection extends BaseActivity implements AppsAdapter.OnItemSele
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getAllApplicationList(CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1262,7 +1261,6 @@ public class AppSelection extends BaseActivity implements AppsAdapter.OnItemSele
 
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -1459,7 +1457,6 @@ public class AppSelection extends BaseActivity implements AppsAdapter.OnItemSele
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 

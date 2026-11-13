@@ -44,7 +44,7 @@ import androidx.work.Data;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
-import com.google.firebase.BuildConfig;
+import com.tabnova.aidashboard.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -879,7 +879,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getScheduleEventList(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -889,7 +888,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -943,7 +941,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1239,7 +1236,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.deleteScheduleEvent(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1249,7 +1245,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -1279,7 +1274,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -1332,7 +1326,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
         if (response != null) {
             if (response.code() == 200) {
                 String responseString = response.body().toString();
-                Log.e("resp", response.body().toString());
                 try {
                     final JSONObject jsonObject = new JSONObject(responseString);
                     if (scheduleEventModels.size() > 0) {
@@ -1351,7 +1344,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
                     //dialogLoader.hideProgressDialog();
                     String resp = response.errorBody().string();
                     Log.d("tag", "onResponse - Status : " + response.code());
-                    Log.e("regErr->", resp);
                     Gson gson = new Gson();
                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 

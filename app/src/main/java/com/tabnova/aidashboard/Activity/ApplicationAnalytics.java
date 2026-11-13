@@ -22,7 +22,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.BuildConfig;
+import com.tabnova.aidashboard.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -416,11 +416,9 @@ public class ApplicationAnalytics extends BaseActivity {
                     jsonObject.addProperty(Consts.device_serial_number, CustomDashboardApplication.getSerialNumber());
                 }
                 jsonObject.add(Consts.applications, appData);
-                Log.e("reqObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.uploadAppsAnalyticsData(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -430,7 +428,6 @@ public class ApplicationAnalytics extends BaseActivity {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -476,7 +473,6 @@ public class ApplicationAnalytics extends BaseActivity {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -518,7 +514,6 @@ public class ApplicationAnalytics extends BaseActivity {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getAppsAnalyticsData(CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -528,7 +523,6 @@ public class ApplicationAnalytics extends BaseActivity {
 
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -589,7 +583,6 @@ public class ApplicationAnalytics extends BaseActivity {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 

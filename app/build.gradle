@@ -36,6 +36,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
     lint {
         checkReleaseBuilds = false
         // Or, if you prefer, you can continue to check for errors in release builds,

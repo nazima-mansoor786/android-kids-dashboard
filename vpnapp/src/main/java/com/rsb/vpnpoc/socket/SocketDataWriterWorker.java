@@ -104,7 +104,6 @@ public class SocketDataWriterWorker implements Runnable {
             Log.d(TAG, "****** data write to server ********");
             Log.d(TAG, str);
             Log.d(TAG, "***** end writing to server *******");
-            Log.d(TAG, "writing data to remote UDP: " + name);
             channel.write(buffer);
             Date dt = new Date();
             session.connectionStartTime = dt.getTime();
@@ -177,12 +176,10 @@ public class SocketDataWriterWorker implements Runnable {
         Matcher m = Patterns.WEB_URL.matcher(url);
         while (m.find()) {
             String url1 = m.group();
-            Log.e(TAG, "VPNPOC url " + url1);
 			/*String url = m.group();
 			Log.d(TAG, "URL extracted: " + url);
 			links.add(url);*/
             if (MySingletonClass.getInstance().isBlocked(url1)) {
-                Log.e(TAG, "VPNPOC url detected blocked host" + url1);
                 //	appendLog("VPNPOC detected blocked host " + url1);
                 return;
             }
@@ -193,7 +190,6 @@ public class SocketDataWriterWorker implements Runnable {
             //	System.out.println(TAG+"host checked-----> " + num_words.get(i));
             Log.d(TAG, "VPNPOC checking blocked host " + num_words.get(i));
             if (url.toLowerCase().contains(num_words.get(i).toLowerCase())) {
-                Log.e(TAG, "VPNPOC detected blocked host " + name);
                 return;
             }
         }
@@ -203,7 +199,6 @@ public class SocketDataWriterWorker implements Runnable {
         buffer.flip();
 
         try {
-            Log.d(TAG, "writing TCP data to: " + name);
             channel.write(buffer);
             //Log.d(TAG,"finished writing data to: "+name);
         } catch (NotYetConnectedException ex) {

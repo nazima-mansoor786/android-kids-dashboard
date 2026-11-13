@@ -205,9 +205,6 @@ class SessionHandler {
 		try {
 			writer.write(data);
 			packetData.addData(data);
-			Log.d(TAG,"Sent RST Packet to client with dest => " +
-					PacketUtil.intToIPAddress(ip.getDestinationIP()) + ":" +
-					tcp.getDestinationPort());
 		} catch (IOException e) {
 			Log.e(TAG,"failed to send RST packet: " + e.getMessage());
 		}
@@ -218,9 +215,6 @@ class SessionHandler {
 		try {
 			writer.write(data);
 			packetData.addData(data);
-			Log.d(TAG,"Sent last ACK Packet to client with dest => " +
-					PacketUtil.intToIPAddress(ip.getDestinationIP()) + ":" +
-					tcp.getDestinationPort());
 		} catch (IOException e) {
 			Log.e(TAG,"failed to send last ACK packet: " + e.getMessage());
 		}
@@ -236,8 +230,6 @@ class SessionHandler {
 			if(session != null){
 				session.getSelectionKey().cancel();
 				SessionManager.INSTANCE.closeSession(session);
-				Log.d(TAG,"ACK to client's FIN and close session => "+PacketUtil.intToIPAddress(ip.getDestinationIP())+":"+tcp.getDestinationPort()
-						+"-"+PacketUtil.intToIPAddress(ip.getSourceIP())+":"+tcp.getSourcePort());
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

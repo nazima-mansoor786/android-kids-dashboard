@@ -84,7 +84,6 @@ public class MySingletonClass {
 
     private void startVPNService(Context context) {
         if (nextBlockedHosts != null && nextBlockedHosts.size() > 0) {
-            Log.e("Singleton", "setBlockedHostsValue: nextBlockedHosts : " + nextBlockedHosts.size());
             blockedHosts.set(nextBlockedHosts);
         } else {
             Log.e("Singleton", "setBlockedHostsValue: nextBlockedHosts : EMPTY");

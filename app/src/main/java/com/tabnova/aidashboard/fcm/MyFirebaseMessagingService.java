@@ -149,7 +149,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         String serialNumber = CustomDashboardApplication.getSerialNumber();
                         if (arr.length == 2) {
                             serialNumber = arr[1];
-                            Log.e(TAG, "sendNotification: Serial number found in notification : " + serialNumber);
                         }
                         /*new Thread(() -> {
                             stopService(new Intent(getApplicationContext(), MediaProjectionService.class));
@@ -168,7 +167,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                             }
                         }).start();*/
 
-                        Log.e(TAG, "sendNotification: Serial Number : " + serialNumber);
 
                         Intent intent = new Intent(getApplicationContext(), ScreenShareActivity.class);
                         if (!sessionManager.getIsSubscriptionEnabled()) {
@@ -221,10 +219,8 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         String serialNumber = CustomDashboardApplication.getSerialNumber();
                         if (arr.length == 2) {
                             serialNumber = arr[1];
-                            Log.e(TAG, "sendNotification: Serial number found in notification : " + serialNumber);
                         }
 
-                        Log.e(TAG, "sendNotification: Serial Number : " + serialNumber);
 
                         Intent intent = new Intent(getApplicationContext(), ScreenShareActivity.class);
                         if (!sessionManager.getIsSubscriptionEnabled()) {
@@ -400,7 +396,6 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     @Override
     public void onNewToken(String token) {
-        Log.d(TAG, "Refreshed token: " + token);
         CustomDashboardApplication.setString(CustomDashboardApplication.getInstance(), Consts.firebase_token, token);
     }
 }

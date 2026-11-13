@@ -204,7 +204,6 @@ public class SecureWebView extends BaseActivity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 if (NetConnectivity.isOnline(SecureWebView.this)) {
                     if (request != null && request.getUrl() != null) {
-                        Log.e("SecureWebView", request.getUrl().toString());
                     }
                 }
                 return super.shouldOverrideUrlLoading(view, request);
@@ -501,13 +500,11 @@ public class SecureWebView extends BaseActivity {
                 // API CALL
                 Call<JsonObject> calls = feedApi.getWebHistory(CustomDashboardApplication.getString(context, Consts.token));
 
-                Log.e("serverReq", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.body() != null) {
-                            Log.e("serverReq", response.body().toString());
                             try {
                                 JSONObject responseObj = new JSONObject(response.body().toString());
 

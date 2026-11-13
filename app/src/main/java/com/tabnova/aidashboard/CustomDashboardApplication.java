@@ -508,7 +508,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
                         if (number != null) {
                             smsLogModels.add(new SmsLogModel(number, body, type, dateString, lastUpdatedData, 1));
                         }
-                        Log.e("SMSLOG", "Number: " + number + " Body: " + body + " Type: " + type + " Date: " + dateString);
                         c.moveToNext();
                     }
                     String ser = SerializeObject.objectToString(smsLogModels);
@@ -571,7 +570,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
                                 smsLogModels.add(new SmsLogModel(number, body, type, dateString, lastUpdatedData, 1));
                             }
                         }
-                        Log.e("SMSLOG", "Number: " + number + " Body: " + body + " Type: " + type + " Date: " + dateString);
                         c.moveToNext();
                     }
                     String ser = SerializeObject.objectToString(smsLogModels);
@@ -681,7 +679,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
         }
 
         CustomDashboardApplication.setString(CustomDashboardApplication.getInstance(), Consts.generated_serial_no, serialNumber);
-        Log.e("serialNumber", serialNumber);
         return serialNumber;
     }
 
@@ -694,7 +691,6 @@ public class CustomDashboardApplication extends Application implements Lifecycle
         }
 
         setString(CustomDashboardApplication.getInstance(), Consts.generated_serial_no, stringBuilder.toString());
-        Log.e("serialNumberRandom", stringBuilder.toString());
         return stringBuilder.toString();
     }
 

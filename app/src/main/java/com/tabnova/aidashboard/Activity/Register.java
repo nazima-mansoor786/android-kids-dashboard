@@ -156,7 +156,6 @@ public class Register extends BaseActivity {
 
                     CustomDashboardApplication.setString(context, Consts.firebase_token, deviceToken);
 
-                    Log.d("", deviceToken);
                 });
 
         // Consent-screen launcher for AuthorizationClient (must be registered before the Activity is STARTED)
@@ -465,11 +464,9 @@ public class Register extends BaseActivity {
                 jsonObject.addProperty(Consts.password, edPassword.getText().toString());
                 jsonObject.addProperty(Consts.device_gcm_token, CustomDashboardApplication.getString(context, Consts.firebase_token));
                 jsonObject.addProperty(Consts.age_group, ageGroupId);
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.profileDeviceRegister(jsonObject);
-                Log.e("requestUrl", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -482,7 +479,6 @@ public class Register extends BaseActivity {
                                 // dialogLoader.hideProgressDialog();
 
                                 String responseString = response.body().toString();
-                                Log.e("resp", response.body().toString());
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
 
@@ -523,7 +519,6 @@ public class Register extends BaseActivity {
                                     // dialogLoader.hideProgressDialog();
                                     String resp = response.errorBody().string();
                                     Log.d("tag", "onResponse - Status : " + response.code());
-                                    Log.e("regErr->", resp);
                                     Gson gson = new Gson();
                                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -586,11 +581,9 @@ public class Register extends BaseActivity {
                     jsonObject.addProperty(Consts.device_serial_number, CustomDashboardApplication.getInstance().getSerialNumber());
                 }
                 //jsonObject.addProperty(Consts.device_serial_number,  CustomDashboardApplication.getInstance().getSerialNumber());
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.checkUserAuthentication(jsonObject);
-                Log.e("requestUrl", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -599,7 +592,6 @@ public class Register extends BaseActivity {
                             //    dialogLoader.hideProgressDialog();
                             if (response.code() == 200) {
                                 final String responseString = response.body().toString();
-                                Log.e("resp", response.body().toString());
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
 
@@ -647,7 +639,6 @@ public class Register extends BaseActivity {
                                     //  dialogLoader.hideProgressDialog();
                                     String resp = response.errorBody().string();
                                     Log.d("tag", "onResponse - Status : " + response.code());
-                                    Log.e("regErr->", resp);
                                     Gson gson = new Gson();
                                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -705,7 +696,6 @@ public class Register extends BaseActivity {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getAuthenticate(Consts.BaseUrl + Consts.SERVICE_AUTHENTICATE + serialNumber + "/" + Consts.defaultPassword);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -715,7 +705,6 @@ public class Register extends BaseActivity {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 //int status = jsonObject.getInt(Consts.status);
@@ -740,7 +729,6 @@ public class Register extends BaseActivity {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -788,7 +776,6 @@ public class Register extends BaseActivity {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getCounter(Consts.BaseUrl + Consts.SERVICE_GET_PROFILE_COUNTER + token);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -798,7 +785,6 @@ public class Register extends BaseActivity {
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -852,7 +838,6 @@ public class Register extends BaseActivity {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -914,7 +899,6 @@ public class Register extends BaseActivity {
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.loginWithGoogle(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -1000,7 +984,6 @@ public class Register extends BaseActivity {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 

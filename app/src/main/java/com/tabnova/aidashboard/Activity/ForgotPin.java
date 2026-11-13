@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 
-import com.google.firebase.BuildConfig;
+import com.tabnova.aidashboard.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.TypeAdapter;
@@ -278,11 +278,9 @@ public class ForgotPin extends BaseActivity {
                 jsonObject.addProperty(Consts.token, CustomDashboardApplication.getString(context, Consts.token));
                 jsonObject.addProperty(Consts.profile_id, profileId);
                 jsonObject.addProperty(Consts.pin, edPin.getText().toString().trim());
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updatePin(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -292,7 +290,6 @@ public class ForgotPin extends BaseActivity {
 
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -336,7 +333,6 @@ public class ForgotPin extends BaseActivity {
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 

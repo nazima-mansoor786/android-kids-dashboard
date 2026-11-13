@@ -395,7 +395,6 @@ public class Utils {
         }
 
         CustomDashboardApplication.setString(context, Consts.generated_serial_no, stringBuilder.toString());
-        Log.e("serialNumberRandom", stringBuilder.toString());
         return stringBuilder.toString();
     }
 

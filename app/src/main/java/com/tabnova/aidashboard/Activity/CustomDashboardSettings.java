@@ -92,7 +92,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.firebase.BuildConfig;
+import com.tabnova.aidashboard.BuildConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -473,7 +473,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
         apiManager = new APIManager(context, this);
 
-        Log.e(TAG, "onCreate: Serial Number : " + CustomDashboardApplication.getString(context, Consts.generated_serial_no));
 
         //Toast.makeText(context, "Setting screen called", Toast.LENGTH_SHORT).show();
         /*if (CustomDashboardApplication.isDeviceSamsungActivated() && !CustomDashboardApplication.isBillingLaunched)
@@ -3865,7 +3864,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
             }
 
             JSONObject jsonObject = new JSONObject(text.toString());
-            Log.e("fileData", jsonObject.toString());
 
             final ArrayList<AppModel> appModels = new ArrayList<>();
 
@@ -5036,11 +5034,9 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                 jsonObject.addProperty(Consts.type, CustomDashboardApplication.getInt(context, Consts.SELECTED_TIMER_TYPE));
                 jsonObject.addProperty(Consts.daily_limit, dailyTimerModels.get(CustomDashboardApplication.getInt(context, Consts.SELECTED_TIMER)).getDailyTimeStr());
 
-                Log.e("requestObj", jsonObject.toString());
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.updateProfileSchedule(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -5050,7 +5046,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                         if (response.code() == 200) {
                             final String responseString = response.body().toString();
-                            Log.e("resp", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -5076,7 +5071,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -5179,7 +5173,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getScheduleEventList(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -5189,7 +5182,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -5246,7 +5238,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -5283,7 +5274,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
         if (response != null) {
             if (response.code() == 200) {
                 String responseString = response.body().toString();
-                Log.e("resp", response.body().toString());
                 try {
                     final JSONObject jsonObject = new JSONObject(responseString);
                     if (scheduleEventModels.size() > 0) {
@@ -5302,7 +5292,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                     //dialogLoader.hideProgressDialog();
                     String resp = response.errorBody().string();
                     Log.d("tag", "onResponse - Status : " + response.code());
-                    Log.e("regErr->", resp);
                     Gson gson = new Gson();
                     TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -5399,7 +5388,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                 jsonObject.addProperty(Consts.profile_id, profileId);
                 // API CALL
                 Call<JsonObject> calls = feedApi.deleteScheduleEvent(jsonObject);
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -5409,7 +5397,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 int status = jsonObject.getInt(Consts.status);
@@ -5444,7 +5431,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -5485,7 +5471,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.logoutUser(Consts.BaseUrl + Consts.SERVICE_LOGOUT + CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("url", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
@@ -5493,7 +5478,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                         if (response.code() == 200) {
                             String responseString = response.body().toString();
-                            Log.e("respCounter", response.body().toString());
                             try {
                                 final JSONObject jsonObject = new JSONObject(responseString);
                                 //ShowMessage.showError(context, jsonObject.getString(Consts.error));
@@ -5530,7 +5514,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                             try {
                                 String resp = response.errorBody().string();
                                 Log.d("tag", "onResponse - Status : " + response.code());
-                                Log.e("regErr->", resp);
                                 Gson gson = new Gson();
                                 TypeAdapter<JsonObject> adapter = gson.getAdapter(JsonObject.class);
 
@@ -5605,14 +5588,12 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.getWebShortcuts(CustomDashboardApplication.getString(context, Consts.token));
-                Log.e("serverReqUrl", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         if (response.body() != null) {
                             try {
-                                Log.e("serverResp", response.body().toString());
                                 JSONObject responseObj = new JSONObject(response.body().toString());
 
                                 Object dataObj = responseObj.get(Consts.data);
@@ -5676,14 +5657,12 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
                 // API CALL
                 Call<JsonObject> calls = feedApi.deleteWebShortcut(CustomDashboardApplication.getString(context, Consts.token), id);
-                Log.e("serverReq", calls.request().toString());
 
                 calls.enqueue(new Callback<JsonObject>() {
                     @Override
                     public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
                         Log.e(TAG, "onResponse: deleteWebShortCuts : ");
                         if (response.body() != null) {
-                            Log.e(TAG, "serverReq : deleteWebShortCuts : Body : " + response.body());
                         } else {
                             if (response.errorBody() != null) {
                                 try {
