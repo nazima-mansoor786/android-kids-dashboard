@@ -3,6 +3,7 @@
     <string name="folder_name">dashboard</string>
     <string name="launch_dashboard">Launch Dashboard</string>
     <string name="default_notification_channel_id">ai_dashboard_channel</string>
+    <string name="notification_channel_name">Notifications</string>
     <string name="ok">OK</string>
     <string name="enter_password">Enter PIN</string>
     <string name="enter_pin">Enter PIN</string>

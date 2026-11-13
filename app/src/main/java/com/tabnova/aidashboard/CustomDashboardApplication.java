@@ -1091,7 +1091,7 @@ public class CustomDashboardApplication extends Application implements Lifecycle
         }
         // FCM default channel (manifest default_notification_channel_id), as in MyFirebaseMessagingService.
         NotificationChannel fcmChannel = new NotificationChannel(getString(R.string.default_notification_channel_id),
-                "NOTIFICATION_CHANNEL_NAME", NotificationManager.IMPORTANCE_HIGH);
+                getString(R.string.notification_channel_name), NotificationManager.IMPORTANCE_HIGH);
         fcmChannel.enableLights(true);
         fcmChannel.setLightColor(Color.RED);
         fcmChannel.enableVibration(true);
