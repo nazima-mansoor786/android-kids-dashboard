@@ -59,7 +59,7 @@ import com.tabnova.aidashboard.Knox.startup.GetAdminActivity;
 import com.tabnova.aidashboard.Knox.startup.SuperLockState;
 import com.tabnova.aidashboard.Knox.utils.Logger;
 import com.tabnova.aidashboard.Model.LocationModel;
-import com.tabnova.aidashboard.Service.AppVisibilityService;
+import com.tabnova.aidashboard.BlockApps.WatchingAccessibilityService;
 import com.tabnova.screenshare.StartStopScreenShare;
 
 import java.util.ArrayList;
@@ -253,19 +253,8 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     public void stopAppVisibilityService() {
-        if (CustomDashboardApplication.isMyServiceRunning(context, AppVisibilityService.class)) {
-            //AppVisibilityService.mWindowManager.removeView();
-            try {
-                if (AppVisibilityService.mWindowManager != null && AppVisibilityService.mFloatingView != null) {
-                    AppVisibilityService.mWindowManager.removeViewImmediate(AppVisibilityService.mFloatingView);
-                    AppVisibilityService.mWindowManager = null;
-                    AppVisibilityService.mFloatingView = null;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            stopService(new Intent(context, AppVisibilityService.class));
-        }
+        // The return-to-dashboard card is now owned by WatchingAccessibilityService.
+        WatchingAccessibilityService.hideReturnOverlay();
     }
 
     @Override
@@ -589,9 +578,9 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                     @Override
                     public void run() {
                         if (Utils.isAppIsInBackground()) {
-                            stopService(new Intent(context, AppVisibilityService.class));
+                            WatchingAccessibilityService.hideReturnOverlay();
                             if (!CustomDashboardApplication.isDeviceSamsung())
-                                startService(new Intent(context, AppVisibilityService.class));
+                                WatchingAccessibilityService.showReturnOverlay(context);
                         }
                     }
                 }, 2000);

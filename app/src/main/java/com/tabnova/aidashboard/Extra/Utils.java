@@ -42,7 +42,7 @@ import com.tabnova.aidashboard.Activity.MainActivity;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 import com.tabnova.aidashboard.Knox.startup.SuperLockState;
 import com.tabnova.aidashboard.R;
-import com.tabnova.aidashboard.Service.AppVisibilityService;
+import com.tabnova.aidashboard.BlockApps.WatchingAccessibilityService;
 import com.tabnova.screenshare.StartStopScreenShare;
 
 import org.json.JSONArray;
@@ -541,7 +541,7 @@ public class Utils {
             e.printStackTrace();
         }
 
-        activity.stopService(new Intent(activity, AppVisibilityService.class));
+        WatchingAccessibilityService.hideReturnOverlay();
 
         SessionManager.getInstance(activity).setIsParentMode(false);
         CustomDashboardApplication.setInt(activity, Consts.is_from_dashboard, 0);

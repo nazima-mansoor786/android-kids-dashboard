@@ -6,10 +6,17 @@ import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.tabnova.aidashboard.Activity.CustomDashboardSettings;
@@ -20,6 +27,7 @@ import com.tabnova.aidashboard.Extra.SerializeObject;
 import com.tabnova.aidashboard.Extra.SessionManager;
 import com.tabnova.aidashboard.Extra.Utils;
 import com.tabnova.aidashboard.Model.AppModel;
+import com.tabnova.aidashboard.R;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,6 +49,93 @@ public class WatchingAccessibilityService extends AccessibilityService {
 
     public static WatchingAccessibilityService getInstance() {
         return sInstance;
+    }
+
+    // ---- Return-to-dashboard overlay (replaces the former AppVisibilityService) ----
+    // Shown as TYPE_ACCESSIBILITY_OVERLAY, so it needs no foreground service and no
+    // SYSTEM_ALERT_WINDOW. Same layout, size, position, flags and tap behavior as before.
+
+    private View returnOverlayView;
+
+    /**
+     * Shows the "please wait" card (if this service is running) and returns to the dashboard.
+     * Idempotent. Runs on the main thread. If the accessibility service is not running,
+     * no card is shown and the app is redirected directly.
+     */
+    public static void showReturnOverlay(final Context context) {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            new Handler(Looper.getMainLooper()).post(() -> showReturnOverlay(context));
+            return;
+        }
+        WatchingAccessibilityService service = sInstance;
+        if (service == null) {
+            CustomDashboardApplication.redirectOnActivity(context.getApplicationContext(), true);
+            return;
+        }
+        service.addReturnOverlay();
+        CustomDashboardApplication.redirectOnActivity(service.getApplicationContext(), true);
+    }
+
+    /** Removes the "please wait" card if it is shown. Idempotent. Runs on the main thread. */
+    public static void hideReturnOverlay() {
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            new Handler(Looper.getMainLooper()).post(WatchingAccessibilityService::hideReturnOverlay);
+            return;
+        }
+        WatchingAccessibilityService service = sInstance;
+        if (service != null) {
+            service.removeReturnOverlay();
+        }
+    }
+
+    private void addReturnOverlay() {
+        if (returnOverlayView != null) {
+            return;
+        }
+        // TYPE_ACCESSIBILITY_OVERLAY must be added through this service's own WindowManager.
+        WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager == null) {
+            return;
+        }
+        View floatingView = LayoutInflater.from(this).inflate(R.layout.frame_overlay_apps, null);
+        LinearLayout llMain = floatingView.findViewById(R.id.ll_main);
+
+        final WindowManager.LayoutParams localLayoutParams = new WindowManager.LayoutParams();
+        localLayoutParams.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
+        localLayoutParams.gravity = Gravity.CENTER;
+        localLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
+                // this is to enable the notification to recieve touch events
+                WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
+                // Draws over status bar
+                WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+        localLayoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        localLayoutParams.format = PixelFormat.TRANSLUCENT;
+
+        llMain.setOnClickListener(v -> CustomDashboardApplication.redirectOnActivity(getApplicationContext(), true));
+
+        try {
+            windowManager.addView(floatingView, localLayoutParams);
+            returnOverlayView = floatingView;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeReturnOverlay() {
+        View view = returnOverlayView;
+        returnOverlayView = null;
+        if (view == null || !view.isAttachedToWindow()) {
+            return;
+        }
+        try {
+            WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+            if (windowManager != null) {
+                windowManager.removeViewImmediate(view);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -380,10 +475,20 @@ public class WatchingAccessibilityService extends AccessibilityService {
 
     @Override
     public boolean onUnbind(Intent intent) {
+        removeReturnOverlay();
         sInstance = null;
         TasksWindow.dismiss(this);
         //NotificationActionReceiver.cancelNotification(this);
         //sendBroadcast(new Intent(QuickSettingTileService.ACTION_UPDATE_TITLE));
         return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        removeReturnOverlay();
+        if (sInstance == this) {
+            sInstance = null;
+        }
+        super.onDestroy();
     }
 }

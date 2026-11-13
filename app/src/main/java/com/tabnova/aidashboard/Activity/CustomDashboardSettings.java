@@ -147,7 +147,7 @@ import com.tabnova.aidashboard.Model.SettingsModel;
 import com.tabnova.aidashboard.Model.SubSelectedFileFolderModel;
 import com.tabnova.aidashboard.Model.WipeButtonsModel;
 import com.tabnova.aidashboard.R;
-import com.tabnova.aidashboard.Service.AppVisibilityService;
+import com.tabnova.aidashboard.BlockApps.WatchingAccessibilityService;
 import com.tabnova.screenshare.MediaProjectionService;
 import com.tabnova.screenshare.SignallingClient;
 import com.tabnova.screenshare.StartStopScreenShare;
@@ -3189,7 +3189,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
         new Handler().postDelayed(() -> {
             if (!Utils.isAppIsInBackground()) {
-                stopService(new Intent(context, AppVisibilityService.class));
+                WatchingAccessibilityService.hideReturnOverlay();
             }
         }, 3000);
 
@@ -8381,7 +8381,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
             e.printStackTrace();
         }
 
-        stopService(new Intent(context, AppVisibilityService.class));
+        WatchingAccessibilityService.hideReturnOverlay();
 
         SessionManager.getInstance(this).setIsParentMode(true);
         CustomDashboardApplication.setInt(context, Consts.is_from_dashboard, 0);

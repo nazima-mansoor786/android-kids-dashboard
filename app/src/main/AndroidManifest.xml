@@ -326,9 +326,6 @@
         </receiver>
 
         <service
-            android:name=".Service.AppVisibilityService"
-            android:exported="false" />
-        <service
             android:name=".BlockApps.BlockedItemService"
             android:exported="false" />
         <service

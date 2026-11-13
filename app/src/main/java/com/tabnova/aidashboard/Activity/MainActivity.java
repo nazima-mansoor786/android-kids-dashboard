@@ -113,7 +113,7 @@ import com.tabnova.aidashboard.Model.ApplicationTimerModel;
 import com.tabnova.aidashboard.Model.DailyTimerModel;
 import com.tabnova.aidashboard.Model.ScheduleEventModel;
 import com.tabnova.aidashboard.R;
-import com.tabnova.aidashboard.Service.AppVisibilityService;
+import com.tabnova.aidashboard.BlockApps.WatchingAccessibilityService;
 import com.tabnova.screenshare.StartStopScreenShare;
 
 import org.json.JSONArray;
@@ -1690,9 +1690,9 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         }
 
         if (keyCode == KeyEvent.KEYCODE_MENU) {
-            stopService(new Intent(context, AppVisibilityService.class));
+            WatchingAccessibilityService.hideReturnOverlay();
             if (!CustomDashboardApplication.isDeviceSamsung())
-                startService(new Intent(context, AppVisibilityService.class));
+                WatchingAccessibilityService.showReturnOverlay(context);
             if (isMyLauncherDefault()) {
                 //resetPreferredLauncherAndOpenChooser(context);
             }
@@ -3825,7 +3825,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         new Handler().postDelayed(() -> {
             isHomeApp = 0;
             if (!Utils.isAppIsInBackground()) {
-                stopService(new Intent(context, AppVisibilityService.class));
+                WatchingAccessibilityService.hideReturnOverlay();
             }
         }, 3000);
 
@@ -4926,7 +4926,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             e.printStackTrace();
         }*/
 
-        stopService(new Intent(context, AppVisibilityService.class));
+        WatchingAccessibilityService.hideReturnOverlay();
 
         SessionManager.getInstance(this).setIsParentMode(false);
         CustomDashboardApplication.setInt(context, Consts.is_from_dashboard, 0);
