@@ -438,7 +438,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onResume();
         //Logger.i("BaseActivity : Resume");
 
-        StartStopScreenShare.context = context;
 
         Log.e(TAG, "onCreate: Serial Number : " + CustomDashboardApplication.getString(context, Consts.generated_serial_no));
 

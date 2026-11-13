@@ -436,7 +436,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
         context = this;
 
-        StartStopScreenShare.context = context;
 
         pickMediaLauncher = registerForActivityResult(new ActivityResultContracts.PickVisualMedia(),uri -> {
             if (uri != null) {
@@ -8887,7 +8886,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
         builder.setPositiveButton("Ok", (dialogInterface, i) -> {
             if (!TextUtils.isEmpty(editText.getText().toString().trim())) {
                 portNumber = editText.getText().toString().trim();
-                StartStopScreenShare.context = context;
                 StartStopScreenShare.portNumber = portNumber;
                 startScreenCapture();
             } else {

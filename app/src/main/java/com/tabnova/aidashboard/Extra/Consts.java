@@ -1,6 +1,10 @@
 package com.tabnova.aidashboard.Extra;
 
 public class Consts {
+    // Moved from the deleted AppPermissionMain fragment (same values).
+    public static final int CODE_DRAW_OVER_OTHER_APP_PERMISSION = 7890;
+    public static boolean overlayViewPermissionStatus;
+
     public static final String PRIVACY_POLICY = "https://www.kidsdashboard.co.uk/privacy2.html";
     public static final String TERMS_SERVICE = "https://www.kidsdashboard.co.uk/privacy2.html";
 

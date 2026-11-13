@@ -44,7 +44,7 @@ import com.tabnova.aidashboard.R;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-import static com.tabnova.aidashboard.Fragment.AppPermissionMain.CODE_DRAW_OVER_OTHER_APP_PERMISSION;
+import static com.tabnova.aidashboard.Extra.Consts.CODE_DRAW_OVER_OTHER_APP_PERMISSION;
 
 public class OverLayScreen extends BaseActivity {
 

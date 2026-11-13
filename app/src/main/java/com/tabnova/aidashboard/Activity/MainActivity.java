@@ -1,7 +1,7 @@
 package com.tabnova.aidashboard.Activity;
 
 import static com.tabnova.aidashboard.CustomDashboardApplication.isAccessibilitySettingsEnabled;
-import static com.tabnova.aidashboard.Fragment.AppPermissionMain.CODE_DRAW_OVER_OTHER_APP_PERMISSION;
+import static com.tabnova.aidashboard.Extra.Consts.CODE_DRAW_OVER_OTHER_APP_PERMISSION;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -105,7 +105,6 @@ import com.tabnova.aidashboard.Extra.SerializeObject;
 import com.tabnova.aidashboard.Extra.SessionManager;
 import com.tabnova.aidashboard.Extra.ShowMessage;
 import com.tabnova.aidashboard.Extra.Utils;
-import com.tabnova.aidashboard.Fragment.AppPermissionMain;
 import com.tabnova.aidashboard.Knox.startup.CommonUtility;
 import com.tabnova.aidashboard.Knox.startup.SuperLockState;
 import com.tabnova.aidashboard.Model.AppModel;
@@ -295,7 +294,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         }*/
 
         context = this;
-        StartStopScreenShare.context = context;
 
         sessionManager = new SessionManager(context);
 
@@ -1043,6 +1041,12 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         Log.e(TAG, "onDestroy: ");
         stopVPN();
         LocalBroadcastManager.getInstance(context).unregisterReceiver(mBroadcastReceiver);
+        // mBroadcastReceiver (battery) is registered with Context.registerReceiver: unregister it too.
+        try {
+            unregisterReceiver(mBroadcastReceiver);
+        } catch (IllegalArgumentException e) {
+            // Not registered.
+        }
         LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver1);
         LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver2);
         LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver3);
@@ -4478,6 +4482,12 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         isBackGround = 1;
 
         LocalBroadcastManager.getInstance(context).unregisterReceiver(mBroadcastReceiver);
+        // mBroadcastReceiver (battery) is registered with Context.registerReceiver: unregister it too.
+        try {
+            unregisterReceiver(mBroadcastReceiver);
+        } catch (IllegalArgumentException e) {
+            // Not registered.
+        }
         //LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver2);
         //LocalBroadcastManager.getInstance(context).unregisterReceiver(broadcastReceiver6);
 
@@ -4760,7 +4770,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
             // if so check once again if we have permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 // continue here - permission was granted
-                AppPermissionMain.overlayViewPermissionStatus = Settings.canDrawOverlays(context);
+                Consts.overlayViewPermissionStatus = Settings.canDrawOverlays(context);
             }
         }
         super.onActivityResult(requestCode, resultCode, data);
