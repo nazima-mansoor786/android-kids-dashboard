@@ -4622,12 +4622,13 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         super.onConfigurationChanged(newConfig);
     }
 
+    // Own request code: never shared with BaseActivity's location request (code 0).
+    private static final int REQUEST_APP_PERMISSIONS = 2001;
+
     // REQUEST PERMISSIONS
     public void requestPermission() {
-        // APP PERMISSIONS
+        // APP PERMISSIONS (storage/media permissions are not declared, so they are not requested)
         String[] permit = new String[]{
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.CAMERA,
                 Manifest.permission.SYSTEM_ALERT_WINDOW,
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -4636,72 +4637,32 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
         };
         if (Utils.isTiramisu()) {
             permit = new String[]{
-                    Manifest.permission.READ_MEDIA_IMAGES,
-                    Manifest.permission.READ_MEDIA_VIDEO,
-                    Manifest.permission.READ_MEDIA_AUDIO,
                     Manifest.permission.CAMERA,
                     Manifest.permission.EXPAND_STATUS_BAR
             };
         } else {
             permit = new String[]{
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                     Manifest.permission.CAMERA,
                     Manifest.permission.EXPAND_STATUS_BAR
             };
         }
-        ActivityCompat.requestPermissions(this, permit, request);
+        ActivityCompat.requestPermissions(this, permit, REQUEST_APP_PERMISSIONS);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == request) {
-            // if (isHomeBtnClicked != 1) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                if (Utils.isTiramisu() && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
-                        && ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    isHomeBtnClicked = 0;
-                    //relAskPermission.setVisibility(View.GONE);
-                    if (CustomDashboardApplication.isDeviceSamsung()) {
-                        if (!SuperLockState.getInstance(context).isESDKLicenseActivated()) {
-
-                        } else {
-                            CustomDashboardApplication.enableSamsungKiosk(context);
-                        }
-                    } else {
-                        if (permissionGiven == 1) {
-                            //showOpenLauncherDialog();
-                        }
+        if (requestCode == REQUEST_APP_PERMISSIONS) {
+            // Handled once; never re-requests.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                isHomeBtnClicked = 0;
+                if (!CustomDashboardApplication.isDeviceSamsung()) {
+                    if (permissionGiven == 1) {
+                        //showOpenLauncherDialog();
                     }
-                    //importFile();
-                } else if (Utils.isMarshMallow() && Utils.isLessTiramisu() &&
-                        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                        ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
-                        && ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    isHomeBtnClicked = 0;
-                    //relAskPermission.setVisibility(View.GONE);
-                    if (CustomDashboardApplication.isDeviceSamsung()) {
-                        if (!SuperLockState.getInstance(context).isESDKLicenseActivated()) {
-
-                        } else {
-                            CustomDashboardApplication.enableSamsungKiosk(context);
-                        }
-                    } else {
-                        if (permissionGiven == 1) {
-                            //showOpenLauncherDialog();
-                        }
-                    }
-                    //importFile();
-                } else {
-                    requestPermission();
                 }
-            } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-
             }
-            // } else {
-            //  isHomeBtnClicked = 0;
-            // }
         } else if (requestCode == Utils.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE) {
             // Only CAMERA is requested with this code (Take photo).
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
