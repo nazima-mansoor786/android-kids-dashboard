@@ -329,6 +329,7 @@ public class StartStopScreenShare {
         }
         sessionActive = false;
         releaseCapture();
+        final PeerConnection peer = localPeer;
         try {
             if (SignallingClient.getInstance() != null) {
                 SignallingClient.getInstance().isStarted = false;
@@ -342,6 +343,50 @@ public class StartStopScreenShare {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        disposeMedia(peer);
+    }
+
+    /**
+     * Frees the per-session WebRTC objects created in start(), once, in dependency order:
+     * peer connection (which also disposes its local stream and track), the track if no peer
+     * owned it, the video source, the factory, then the EGL context.
+     */
+    private static void disposeMedia(PeerConnection peer) {
+        try {
+            if (peer != null) {
+                peer.dispose();
+            } else if (localVideoTrack != null) {
+                localVideoTrack.dispose();
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+        localPeer = null;
+        localVideoTrack = null;
+        try {
+            if (videoSource != null) {
+                videoSource.dispose();
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+        videoSource = null;
+        try {
+            if (peerConnectionFactory != null) {
+                peerConnectionFactory.dispose();
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+        peerConnectionFactory = null;
+        try {
+            if (rootEglBase != null) {
+                rootEglBase.release();
+            }
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+        rootEglBase = null;
     }
 
     /** Stops and disposes the screen capturer (ends the MediaProjection) and clears the consent token. */
@@ -390,7 +435,8 @@ public class StartStopScreenShare {
         @Override
         public void onRemoteHangUp(String msg) {
             Log.e(TAG, "onRemoteHangUp: " + msg);
-            mainHandler.post(StartStopScreenShare::hangup);
+            // Off the main thread: SignallingClient.close() sleeps while it says "bye".
+            new Thread(StartStopScreenShare::hangup).start();
         }
 
         @Override
