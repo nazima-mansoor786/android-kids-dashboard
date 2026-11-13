@@ -300,11 +300,6 @@ public class BlockedApps extends BaseActivity {
     }
 
     @Override
-    public void onBackPressed() {
-
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_HOME) {
             return false;

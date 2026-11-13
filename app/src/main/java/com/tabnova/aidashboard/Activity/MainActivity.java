@@ -4541,11 +4541,6 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
 
 
     @Override
-    public void onBackPressed() {
-        Log.e("MainActivity", "onBackPressed");
-    }
-
-    @Override
     public void OnSelectItem(int pos) {
         isHomeApp = 1;
 

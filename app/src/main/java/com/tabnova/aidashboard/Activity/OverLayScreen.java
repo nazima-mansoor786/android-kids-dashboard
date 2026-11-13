@@ -404,11 +404,6 @@ public class OverLayScreen extends BaseActivity {
         return true;
     }
 
-    @Override
-    public void onBackPressed() {
-
-    }
-
     // SHOW SET TIMER SETTINGS DIALOG
     void showSetTimerDialog() {
         try {

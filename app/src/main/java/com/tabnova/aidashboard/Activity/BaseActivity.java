@@ -24,6 +24,7 @@ import android.view.Gravity;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -100,6 +101,14 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Kiosk: system Back is blocked on every screen by default (replaces the former empty
+        // onBackPressed()). Screens that need Back register their own callback, which takes priority.
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Intentionally empty: Back is blocked.
+            }
+        });
         context = this;
         apiManager = new APIManager(context);
         dbHelper = new DbHelper(this);
@@ -586,11 +595,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                 }, 2000);
             }
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-
     }
 
     void setAllPermission(Context context) {

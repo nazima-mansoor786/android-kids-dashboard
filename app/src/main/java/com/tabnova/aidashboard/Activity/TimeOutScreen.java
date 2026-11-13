@@ -1050,11 +1050,6 @@ public class TimeOutScreen extends BaseActivity implements ScheduleEventListAdap
 
 
     @Override
-    public void onBackPressed() {
-
-    }
-
-    @Override
     public void OnSelectEvent(final int pos, final String groupId, int isDelete) {
         if (isDelete == 1) {
 
