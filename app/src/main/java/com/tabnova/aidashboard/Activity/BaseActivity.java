@@ -465,10 +465,6 @@ public class BaseActivity extends AppCompatActivity implements GoogleApiClient.C
                                 != PackageManager.PERMISSION_GRANTED ||
                         ContextCompat.checkSelfPermission(
                                 this,
-                                Manifest.permission.GET_ACCOUNTS)
-                                != PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(
-                                this,
                                 Manifest.permission.READ_PHONE_STATE)
                                 != PackageManager.PERMISSION_GRANTED)
                     setAllPermission(this);
