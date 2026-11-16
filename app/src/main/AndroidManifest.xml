@@ -191,14 +191,14 @@
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
             android:theme="@style/AppThemeNew"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"/>
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".Activity.MainActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:stateNotNeeded="true"
             android:theme="@style/AppThemeNew"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize"/>
+            android:configChanges="orientation|screenSize"/>
         <activity
             android:name=".Knox.startup.BeginActivity"
             android:exported="false" />
