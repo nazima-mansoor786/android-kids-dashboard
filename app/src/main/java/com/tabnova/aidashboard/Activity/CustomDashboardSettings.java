@@ -1966,10 +1966,9 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
             });
 
             ivFolder.setOnClickListener(v -> {
-                Intent intent = new Intent();
-                intent.setAction(Intent.ACTION_OPEN_DOCUMENT_TREE);
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
-                startActivityForResult(intent, PICKFILE_REQUEST_CODE);
+                // Pick the exported zip directly (replaces the old folder picker).
+                importFile();
+                alertDialogImportExport.dismiss();
             });
 
 
@@ -2002,48 +2001,47 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
     }
 
-    // GET FILE
+    // GET FILE: pick the exported .zip with the system file picker (no storage permission).
     public void importFile() {
         try {
-            String path = selectedPath;
-            String f = null;
-            try {
-                f = new File(path).getCanonicalFile().getName();
-
-                String pathFile = Environment.getExternalStorageDirectory().toString() + "/" + path;
-                File directory = new File(pathFile);
-                File[] list = directory.listFiles();
-                if (list == null) {
-
-                }
-
-                List<String> fileNams = new ArrayList<>();
-                for (int i = 0; i < list.length; ++i) {
-                    if (list[i].isFile()) {
-                        String name = list[i].getPath();
-                        if (!name.isEmpty()) {
-                            String extension = name.substring(name.lastIndexOf("."));
-                            if (!extension.isEmpty()) {
-                                if (extension.contentEquals(".json") || extension.contentEquals(".txt")) {
-                                    fileNams.add(name);
-                                    importFileData(selectedPath);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
+            importZipLauncher.launch(new String[]{"application/zip", "application/x-zip-compressed", "application/octet-stream"});
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    /** Exported settings JSON waiting for the user to choose where to save the zip. */
+    private String pendingExportJson;
+
+    private final ActivityResultLauncher<String> exportZipLauncher = registerForActivityResult(
+            new ActivityResultContracts.CreateDocument("application/zip"),
+            uri -> {
+                String json = pendingExportJson;
+                pendingExportJson = null;
+                if (uri == null || json == null) {
+                    return;
+                }
+                try {
+                    Utils.writeDashboardZip(context, uri, json);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+
+    private final ActivityResultLauncher<String[]> importZipLauncher = registerForActivityResult(
+            new ActivityResultContracts.OpenDocument(),
+            uri -> {
+                if (uri == null) {
+                    return;
+                }
+                try {
+                    if (Utils.extractDashboardZip(context, uri)) {
+                        importFileData("dashboard");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
 
 
     // EXPORT IN EXTERNAL STORAGE
@@ -2057,9 +2055,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
           /*  File directory = new File(Environment.getExternalStorageDirectory(),
                     getResources().getString(R.string.app_name) +"/"+getResources().getString(R.string.app_analytics));*/
-            File directory = new File(Environment.getExternalStorageDirectory(), getResources().getString(R.string.folder_name));
-            if (!directory.exists())
-                directory.getParentFile().mkdirs();
 
             Gson gson = new GsonBuilder().create();
 
@@ -2185,24 +2180,9 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                     appData.add(Consts.app_data, detailsObj);
 
                     String str = appData.toString();
-                    File file;
-                    try {
-                        file = new File(directory, fileName);
-
-                        FileWriter fileWriter = new FileWriter(file);
-                  /*  BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                    bufferedWriter.write("{}");
-                    bufferedWriter.close();*/
-                        fileWriter.write(str);
-                        fileWriter.flush();
-                        fileWriter.close();
-
-                    /*outputStream = new FileOutputStream(file);
-                    outputStream.write(str.getBytes());
-                    outputStream.close();*/
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    // Exported as dashboard.txt inside a zip the user saves with the system file picker.
+                    pendingExportJson = str;
+                    exportZipLauncher.launch(fileName + ".zip");
                 }
             }
         } else {
@@ -2272,9 +2252,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                 }
             }*/
 
-            File directory = new File(Environment.getExternalStorageDirectory(), getResources().getString(R.string.folder_name));
-            if (!directory.exists())
-                directory.getParentFile().mkdirs();
 
 
             Gson gson = new GsonBuilder().create();
@@ -2409,24 +2386,9 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                     appData.add(Consts.app_data, detailsObj);
 
                     String str = appData.toString();
-                    File file;
-                    try {
-                        file = new File(directory, fileName + ".txt");
-
-                        FileWriter fileWriter = new FileWriter(file);
-                  /*  BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                    bufferedWriter.write("{}");
-                    bufferedWriter.close();*/
-                        fileWriter.write(str);
-                        fileWriter.flush();
-                        fileWriter.close();
-
-                    /*outputStream = new FileOutputStream(file);
-                    outputStream.write(str.getBytes());
-                    outputStream.close();*/
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    // Exported as dashboard.txt inside a zip the user saves with the system file picker.
+                    pendingExportJson = str;
+                    exportZipLauncher.launch(fileName + ".zip");
                 }
             }
         }
@@ -3832,7 +3794,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                     }
                 }*/
 
-                File imageFile = new File(Environment.getExternalStorageDirectory() + "/" + getResources().getString(R.string.folder_name), "screen1.png");
+                File imageFile = new File(Utils.getDashboardImportDir(context), "screen1.png");
 
                 if (imageFile.exists()) {
                     final Uri contentURI = Uri.parse(imageFile.toString());
@@ -3840,7 +3802,7 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
                     CustomDashboardApplication.setString(context, Consts.IMG_FILE, contentURI.toString());
                 }
 
-                File file = new File(Environment.getExternalStorageDirectory() + "/" + getResources().getString(R.string.folder_name), fileName + ".txt");
+                File file = new File(Utils.getDashboardImportDir(context), fileName + ".txt");
                 //File file = new File(fileName+".txt");
 
                 if (file.exists()) {

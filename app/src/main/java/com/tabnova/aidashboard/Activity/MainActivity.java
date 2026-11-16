@@ -2095,7 +2095,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                             imageFile = new File(downloadFile.getAbsolutePath(), "screen1.png");
                         }
                     } else {*/
-                    imageFile = new File(Environment.getExternalStorageDirectory() + "/" + getResources().getString(R.string.folder_name), "screen1.png");
+                    imageFile = new File(Utils.getDashboardImportDir(context), "screen1.png");
                     //  }
 
                     if (imageFile.exists()) {
@@ -2112,7 +2112,7 @@ public class MainActivity extends BaseActivity implements RecyclerViewAdapter.On
                             file = new File(downloadFile.getAbsolutePath(), "dashboard.txt");
                         }
                     } else {*/
-                    file = new File(Environment.getExternalStorageDirectory() + "/" + getResources().getString(R.string.folder_name), "dashboard.txt");
+                    file = new File(Utils.getDashboardImportDir(context), "dashboard.txt");
                     // }
 
                     if (file.exists()) {

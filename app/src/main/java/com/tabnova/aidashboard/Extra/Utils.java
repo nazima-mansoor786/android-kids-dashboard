@@ -480,6 +480,94 @@ public class Utils {
         editor.apply();
     }
 
+    /** App-specific folder holding an imported dashboard.txt / screen1.png (no storage permission). */
+    public static File getDashboardImportDir(Context context) {
+        File dir = new File(context.getExternalFilesDir(null), context.getString(R.string.folder_name));
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        return dir;
+    }
+
+    /** Writes the export zip: dashboard.txt (settings JSON) and, if a wallpaper is set, screen1.png. */
+    public static void writeDashboardZip(Context context, Uri target, String json) throws IOException {
+        java.io.OutputStream out = context.getContentResolver().openOutputStream(target);
+        if (out == null) {
+            throw new IOException("Cannot open export target");
+        }
+        try (java.util.zip.ZipOutputStream zip = new java.util.zip.ZipOutputStream(out)) {
+            zip.putNextEntry(new java.util.zip.ZipEntry("dashboard.txt"));
+            zip.write(json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            zip.closeEntry();
+
+            String wallpaper = CustomDashboardApplication.getString(context, Consts.IMG_FILE);
+            if (!TextUtils.isEmpty(wallpaper)) {
+                java.io.InputStream in = null;
+                try {
+                    Uri wallpaperUri = Uri.parse(wallpaper);
+                    if ("content".equals(wallpaperUri.getScheme()) || "file".equals(wallpaperUri.getScheme())) {
+                        in = context.getContentResolver().openInputStream(wallpaperUri);
+                    } else {
+                        File wallpaperFile = new File(wallpaper);
+                        if (wallpaperFile.exists()) {
+                            in = new java.io.FileInputStream(wallpaperFile);
+                        }
+                    }
+                    if (in != null) {
+                        zip.putNextEntry(new java.util.zip.ZipEntry("screen1.png"));
+                        byte[] buffer = new byte[8192];
+                        int read;
+                        while ((read = in.read(buffer)) != -1) {
+                            zip.write(buffer, 0, read);
+                        }
+                        zip.closeEntry();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (in != null) {
+                        in.close();
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Extracts dashboard.txt and screen1.png from an import zip into {@link #getDashboardImportDir}.
+     * Other entries are ignored (no path traversal). Returns true if dashboard.txt was found.
+     */
+    public static boolean extractDashboardZip(Context context, Uri source) throws IOException {
+        File dir = getDashboardImportDir(context);
+        new File(dir, "dashboard.txt").delete();
+        new File(dir, "screen1.png").delete();
+        boolean foundData = false;
+        java.io.InputStream in = context.getContentResolver().openInputStream(source);
+        if (in == null) {
+            return false;
+        }
+        try (java.util.zip.ZipInputStream zip = new java.util.zip.ZipInputStream(in)) {
+            java.util.zip.ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                String name = entry.getName();
+                if (entry.isDirectory() || !("dashboard.txt".equals(name) || "screen1.png".equals(name))) {
+                    continue;
+                }
+                try (FileOutputStream out = new FileOutputStream(new File(dir, name))) {
+                    byte[] buffer = new byte[8192];
+                    int read;
+                    while ((read = zip.read(buffer)) != -1) {
+                        out.write(buffer, 0, read);
+                    }
+                }
+                if ("dashboard.txt".equals(name)) {
+                    foundData = true;
+                }
+            }
+        }
+        return foundData;
+    }
+
     public static boolean isTiramisu() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU;
     }
