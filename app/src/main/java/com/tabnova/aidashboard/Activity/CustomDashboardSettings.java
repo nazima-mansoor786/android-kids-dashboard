@@ -223,7 +223,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
     private AppCompatDialog alertDialogLabels;
     private AppCompatDialog alertDialogMarketPlace;
     private AppCompatDialog alertDialogDisableRecentsButton;
-    private AppCompatDialog alertDialogCallSmsLogs;
     private AppCompatDialog alertVolumeControl;
     private AppCompatDialog alertSelectImage;
     private AppCompatDialog alertDialogSettings;
@@ -3632,75 +3631,6 @@ public class CustomDashboardSettings extends BaseActivity implements SettingsApp
 
             alertDialogDisableRecentsButton.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             alertDialogDisableRecentsButton.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    void showCallSmsLogsDialog() {
-        try {
-            alertDialogCallSmsLogs = new AppCompatDialog(context);
-            alertDialogCallSmsLogs.setContentView(R.layout.dialog_call_sms_logs);
-
-            CheckBox cbSyncCall = alertDialogCallSmsLogs.findViewById(R.id.cb_sync_call);
-            CheckBox cbSyncSms = alertDialogCallSmsLogs.findViewById(R.id.cb_sync_sms);
-
-            cbSyncCall.setChecked(CustomDashboardApplication.getInt(context, Consts.SYNC_CALL_LOGS) == 1);
-
-            cbSyncSms.setChecked(CustomDashboardApplication.getInt(context, Consts.SYNC_SMS) == 1);
-
-            cbSyncCall.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        /*if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                                && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                                && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
-                            CustomDashboardApplication.setInt(context, Consts.SYNC_CALL_LOGS, 1);
-                            syncType = 1;
-                            //CustomDashboardApplication.getCallLog(context);
-                            //CustomDashboardApplication.setInt(context, Consts.device_counter, CustomDashboardApplication.getInt(context, Consts.device_counter) + 1);
-                            // apiManager.savePhoneHistory(context, 0);
-                        } else {
-                            requestReadLogsPermission();
-                        }*/
-                    } else {
-                        CustomDashboardApplication.setInt(context, Consts.SYNC_CALL_LOGS, 1);
-                        // CustomDashboardApplication.getCallLog(context);
-                        //CustomDashboardApplication.setInt(context, Consts.device_counter, CustomDashboardApplication.getInt(context, Consts.device_counter) + 1);
-                        //apiManager.savePhoneHistory(context, 0);
-                    }
-                } else {
-                    CustomDashboardApplication.setInt(context, Consts.SYNC_CALL_LOGS, 0);
-                }
-            });
-
-            cbSyncSms.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        /*if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED
-                                && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALL_LOG) == PackageManager.PERMISSION_GRANTED
-                                && ContextCompat.checkSelfPermission(context, Manifest.permission.READ_SMS) == PackageManager.PERMISSION_GRANTED) {
-                            CustomDashboardApplication.setInt(context, Consts.SYNC_SMS, 1);
-                            syncType = 2;
-                            CustomDashboardApplication.getAllSms(context);
-                            //CustomDashboardApplication.setInt(context, Consts.device_counter, CustomDashboardApplication.getInt(context, Consts.device_counter) + 1);
-                            // apiManager.savePhoneHistory(context, 1);
-                        } else {
-                            requestReadLogsPermission();
-                        }*/
-                    } else {
-                        CustomDashboardApplication.setInt(context, Consts.SYNC_SMS, 1);
-                        CustomDashboardApplication.getAllSms(context);
-                        //CustomDashboardApplication.setInt(context, Consts.device_counter, CustomDashboardApplication.getInt(context, Consts.device_counter) + 1);
-                        // apiManager.savePhoneHistory(context, 1);
-                    }
-                } else {
-                    CustomDashboardApplication.setInt(context, Consts.SYNC_SMS, 0);
-                }
-            });
-
-            alertDialogCallSmsLogs.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            alertDialogCallSmsLogs.show();
         } catch (Exception e) {
             e.printStackTrace();
         }

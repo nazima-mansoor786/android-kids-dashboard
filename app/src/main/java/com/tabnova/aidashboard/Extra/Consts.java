@@ -336,8 +336,6 @@ public class Consts {
     public static String s_voice_status = "s_voice_status";
     public static String volume_down_key_status = "volume_down_key_status";
     public static String over_the_air_status = "over_the_air_status";
-    public static String lastUpdatedCallLogDate = "lastUpdatedCallLogDate";
-    public static String lastUpdatedSmsLogDate = "lastUpdatedSmsLogDate";
     public static String exit_app = "exit_app";
     public static String from_settings = "from_settings";
     public static String is_screen_share = "is_screen_share";
