@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import com.tabnova.aidashboard.BuildConfig;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -27,7 +29,8 @@ public class Logger {
      * debug or not
      */
     private static boolean debug = true;
-    private static boolean write2Sdcard = true;
+    /** File logging only in debug builds; logcat output is unchanged. */
+    private static final boolean write2Sdcard = BuildConfig.DEBUG;
     private static Logger instance = new Logger();
 
     private static String appFilesRoot() {
