@@ -1,5 +1,7 @@
 package com.tabnova.aidashboard.Extra;
 
+import com.tabnova.aidashboard.BuildConfig;
+
 public class Consts {
     // Moved from the deleted AppPermissionMain fragment (same values).
     public static final int CODE_DRAW_OVER_OTHER_APP_PERMISSION = 7890;
@@ -49,7 +51,7 @@ public class Consts {
     public static final String ServiceUrl = "https://cloud.kidsdashboard.co.uk/";
     public static final String BaseUrl = ServiceUrl + "api/v1/";
     public static final String BaseUrlV2 = ServiceUrl + "api/v2/";
-    public static final String defaultPassword = "d8578edf8458ce06fbc5bb76a58c5ca4";
+    public static final String defaultPassword = BuildConfig.DEFAULT_PASSWORD;
     public static final String test = "c6d27be6114ead098f07d7e2d7752d7773b24932b54107850dfe37c3573d748a";
     public static final String getFavIconUrl = "https://www.google.com/s2/favicons?domain=";
 

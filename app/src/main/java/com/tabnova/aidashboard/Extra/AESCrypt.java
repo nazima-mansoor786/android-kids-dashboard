@@ -3,6 +3,7 @@ package com.tabnova.aidashboard.Extra;
 import android.content.Context;
 import android.util.Base64;
 
+import com.tabnova.aidashboard.BuildConfig;
 import com.tabnova.aidashboard.CustomDashboardApplication;
 
 import java.nio.charset.StandardCharsets;
@@ -14,7 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class AESCrypt {
 
     private static final String ALGORITHM = "AES";
-    private static final String KEY = "1Hbfh667adfDEJ78";
+    private static final String KEY = BuildConfig.AES_KEY;
 
 
     public static void encrypt(Context context, String value) throws Exception

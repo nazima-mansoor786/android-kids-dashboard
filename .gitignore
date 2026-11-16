@@ -58,6 +58,7 @@ Thumbs.db
 # Local machine config and signing secrets
 local.properties
 keystore.properties
+secrets.properties
 *.jks
 *.keystore
 

@@ -1,5 +1,7 @@
 package com.tabnova.aidashboard.Knox.license;
 
+import com.tabnova.aidashboard.BuildConfig;
+
 public class Const {
 
     protected static final String URL_BASE = "https://b2b.tabnova.com/api/v1";
@@ -12,7 +14,7 @@ public class Const {
     ///api/v1/register/{deviceserialnumber}/{devicepassword}/{suscriptioncode}/{profileid}
     public static final String REGISTER = URL_BASE + "/register/";
 
-    public static final String BASIC_PASSWORD = "qwerty";
+    public static final String BASIC_PASSWORD = BuildConfig.KNOX_BASIC_PASSWORD;
 
     public static final String DEVICE_PROFILE_LICENCES = URL_BASE + "/deviceprofilelicences/";
 
@@ -34,7 +36,7 @@ public class Const {
 
     public static final String IGNORE_KNOX_LICENSE = "ignore_knox_samsung_license";
 
-    public static final String KNOX_LICENSE_SDK_KEY = "KLM09-N85U9-EGSNV-HCZEW-P1ULV-QR8VI";
+    public static final String KNOX_LICENSE_SDK_KEY = BuildConfig.KNOX_LICENSE_SDK_KEY;
 //    public static final String KNOX_LICENSE_SDK_KEY = "KLM09-N0B4M-TQAGR-JGD18-U3X1C-QKPRA";
 
 }

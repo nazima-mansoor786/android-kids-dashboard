@@ -2,6 +2,36 @@ plugins {
     id 'com.android.library'
 }
 
+// Xirsys credentials are read from <root>/secrets.properties (not tracked by git;
+// see secrets.properties.example). Missing file or key -> empty string, so the build still works.
+def secretsPropertiesFile = rootProject.file('secrets.properties')
+def secretsProperties = new java.util.Properties()
+if (secretsPropertiesFile.exists()) {
+    secretsPropertiesFile.withInputStream { secretsProperties.load(it) }
+}
+def secretField = { String key ->
+    def value = secretsProperties.getProperty(key, '')
+    return '"' + value.replace('\\', '\\\\').replace('"', '\\"') + '"'
+}
+
+// Missing Xirsys credentials only warn (screen-share ICE lookup will not authenticate).
+def missingXirsysSecrets = ['XIRSYS_IDENT', 'XIRSYS_SECRET'].findAll {
+    secretsProperties.getProperty(it, '').trim().isEmpty()
+}
+def missingXirsysSecretsMessage = "secrets.properties missing or incomplete (empty: ${missingXirsysSecrets.join(', ')}) - see secrets.properties.example".toString()
+tasks.register('checkXirsysSecrets') {
+    doLast {
+        if (!missingXirsysSecrets.isEmpty()) {
+            logger.warn("WARNING: " + missingXirsysSecretsMessage)
+        }
+    }
+}
+tasks.configureEach { task ->
+    if (task.name == 'preBuild') {
+        task.dependsOn 'checkXirsysSecrets'
+    }
+}
+
 android {
     namespace "com.tabnova.screenshare"
     compileSdk 36
@@ -11,6 +41,13 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
+
+        buildConfigField "String", "XIRSYS_IDENT", secretField('XIRSYS_IDENT')
+        buildConfigField "String", "XIRSYS_SECRET", secretField('XIRSYS_SECRET')
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {

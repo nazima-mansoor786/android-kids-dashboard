@@ -95,7 +95,7 @@ public class StartStopScreenShare {
         //get Ice servers using xirsys
         byte[] data = new byte[0];
         try {
-            data = ("<xirsys_ident>:<xirsys_secret>").getBytes("UTF-8");
+            data = (BuildConfig.XIRSYS_IDENT + ":" + BuildConfig.XIRSYS_SECRET).getBytes("UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
