@@ -29,6 +29,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -115,6 +117,34 @@ public class SecureWebView extends BaseActivity {
     int MY_PERMISSIONS_REQUEST_RECORD_VIDEO = 4444;
 
     String mCameraPhotoPath = "";
+
+    /** Gallery/camera chooser for <input type=file>; the result goes to mFilePathCallback exactly once. */
+    private final ActivityResultLauncher<Intent> fileChooserLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Uri[] results = null;
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null && data.getData() != null) {
+                        results = new Uri[]{data.getData()};
+                    } else if (data != null && data.getClipData() != null && data.getClipData().getItemCount() > 0) {
+                        results = new Uri[]{data.getClipData().getItemAt(0).getUri()};
+                    } else if (!mCameraPhotoPath.isEmpty()) {
+                        // Camera wrote the photo to the FileProvider URI passed as EXTRA_OUTPUT.
+                        results = new Uri[]{Uri.parse(mCameraPhotoPath)};
+                    }
+                }
+                deliverFileChooserResult(results);
+            });
+
+    private void deliverFileChooserResult(Uri[] results) {
+        ValueCallback<Uri[]> callback = mFilePathCallback;
+        mFilePathCallback = null;
+        mCameraPhotoPath = "";
+        if (callback != null) {
+            callback.onReceiveValue(results);
+        }
+    }
 
     PermissionRequest webViewRequest;
 
@@ -241,9 +271,14 @@ public class SecureWebView extends BaseActivity {
                     mFilePathCallback = null;
                 }
                 mFilePathCallback = filePath;
-                Intent i = fileChooserParams.createIntent();
+                mCameraPhotoPath = "";
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                // The app declares CAMERA, so ACTION_IMAGE_CAPTURE needs it granted; otherwise offer gallery only.
+                boolean cameraAllowed = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                        == PackageManager.PERMISSION_GRANTED;
+                if (!cameraAllowed) {
+                    takePictureIntent = null;
+                } else if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     // Create the File where the photo should go
                     File photoFile = null;
                     try {
@@ -279,11 +314,15 @@ public class SecureWebView extends BaseActivity {
                 }
 
                 Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-                chooserIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, false);
-                chooserIntent.putExtra(Intent.EXTRA_INTENT, i);
+                chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
                 chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
                 chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-                startActivityForResult(contentSelectionIntent, INPUT_FILE_REQUEST_CODE);
+                try {
+                    fileChooserLauncher.launch(chooserIntent);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    deliverFileChooserResult(null);
+                }
 
                 return true;
             }
