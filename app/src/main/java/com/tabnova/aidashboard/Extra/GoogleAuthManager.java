@@ -31,7 +31,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption;
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential;
-import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException;
 import com.tabnova.aidashboard.R;
 
 import java.lang.ref.WeakReference;
@@ -124,7 +123,11 @@ public final class GoogleAuthManager {
                     return;
                 }
                 callback.onSuccess(email, idToken);
-            } catch (GoogleIdTokenParsingException e) {
+            } catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
+                // GoogleIdTokenParsingException: thrown by createFrom, but not declared (Kotlin API),
+                // so javac rejects catching it by name. Unchecked exceptions are rethrown above as before.
                 callback.onError("Could not read the Google credential");
             }
         } else {
