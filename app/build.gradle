@@ -56,7 +56,7 @@ android {
         //com.tabnova.classroomapp
         //com.tabnova.aidashboard
         applicationId "com.tabnova.aidashboard"
-        minSdk 23
+        minSdk 24
         targetSdk 36
         versionCode 116
         versionName "74.6"
