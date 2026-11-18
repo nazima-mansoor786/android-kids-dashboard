@@ -123,11 +123,7 @@ public final class GoogleAuthManager {
                     return;
                 }
                 callback.onSuccess(email, idToken);
-            } catch (RuntimeException e) {
-                throw e;
             } catch (Exception e) {
-                // GoogleIdTokenParsingException: thrown by createFrom, but not declared (Kotlin API),
-                // so javac rejects catching it by name. Unchecked exceptions are rethrown above as before.
                 callback.onError("Could not read the Google credential");
             }
         } else {
